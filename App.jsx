@@ -162,6 +162,16 @@ const callGemini = async (
 const CONTROL_VERSIONS = {
   GroupContainer: "1.4.0",
   Label: "2.5.1",
+  Button: "0.0.45",
+  TextInput: "0.0.54",
+};
+
+const yamlSafeValue = (value) => {
+  if (typeof value !== "string") return value;
+  if (value.includes(": ") || value.includes(" #") || /^[[\]{},]/.test(value)) {
+    return `'${value.replace(/'/g, "''")}'`;
+  }
+  return value;
 };
 
 const yamlControl = (
@@ -186,7 +196,7 @@ const yamlControl = (
   if (propEntries.length > 0) {
     yaml += `${inner}Properties:\n`;
     for (const [key, value] of propEntries) {
-      yaml += `${propPad}${key}: ${value}\n`;
+      yaml += `${propPad}${key}: ${yamlSafeValue(value)}\n`;
     }
   }
   if (childrenYaml) {
