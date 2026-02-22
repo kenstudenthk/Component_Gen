@@ -159,12 +159,8 @@ const callGemini = async (
 };
 
 // --- YAML Generation Logic ---
-const CONTROL_VERSIONS = {
-  GroupContainer: "1.4.0",
-  Label: "2.5.1",
-  Button: "0.0.45",
-  TextInput: "0.0.54",
-};
+// No version pins — Power Apps will use the current version for the environment
+const CONTROL_VERSIONS = {};
 
 const yamlSafeValue = (value) => {
   if (typeof value !== "string") return value;
@@ -205,6 +201,11 @@ const yamlControl = (
   return yaml;
 };
 
+// Sanitize user text: # breaks YAML single-line formulas (treated as comment)
+// and : can be misread as a YAML key. Strip both characters.
+const sanitizeYamlText = (text) =>
+  String(text).replace(/#/g, "").replace(/:/g, "-");
+
 const generatePowerAppsYAML = (activeComponentName, settings) => {
   const type = settings.type;
 
@@ -213,14 +214,14 @@ const generatePowerAppsYAML = (activeComponentName, settings) => {
       settings;
     let children = "";
     children += yamlControl(6, "TitleLabel", "Label", {
-      Text: `="${title}"`,
+      Text: `="${sanitizeYamlText(title)}"`,
       Size: "=20",
       FontWeight: "=FontWeight.Bold",
       X: "=40",
       Y: "=40",
     });
     children += yamlControl(6, "SubtitleLabel", "Label", {
-      Text: `="${subtitle}"`,
+      Text: `="${sanitizeYamlText(subtitle)}"`,
       Size: "=12",
       Color: "=RGBA(100, 116, 139, 1)",
       X: "=40",
@@ -229,14 +230,14 @@ const generatePowerAppsYAML = (activeComponentName, settings) => {
     fields.forEach((field, index) => {
       const yPos = 130 + index * 90;
       children += yamlControl(6, `Label_${index}`, "Label", {
-        Text: `="${field.label}"`,
+        Text: `="${sanitizeYamlText(field.label)}"`,
         FontWeight: "=FontWeight.Semibold",
         X: "=40",
         Y: `=${yPos}`,
       });
       children += yamlControl(6, `Input_${index}`, "TextInput", {
         Default: '=""',
-        HintText: `="${field.placeholder}"`,
+        HintText: `="${sanitizeYamlText(field.placeholder)}"`,
         X: "=40",
         Y: `=${yPos + 30}`,
         Width: "=420",
@@ -247,15 +248,19 @@ const generatePowerAppsYAML = (activeComponentName, settings) => {
     });
     const btnY = 150 + fields.length * 90;
     children += yamlControl(6, "BtnPrimary", "Button", {
-      Text: `="${primaryButtonText}"`,
+      Text: `="${sanitizeYamlText(primaryButtonText)}"`,
       X: "=40",
       Y: `=${btnY}`,
+      Width: "=200",
+      Height: "=40",
       Fill: "=RGBA(59, 130, 246, 1)",
     });
     children += yamlControl(6, "BtnSecondary", "Button", {
-      Text: `="${secondaryButtonText}"`,
+      Text: `="${sanitizeYamlText(secondaryButtonText)}"`,
       X: "=260",
       Y: `=${btnY}`,
+      Width: "=200",
+      Height: "=40",
       Fill: "=RGBA(241, 245, 249, 1)",
       Color: "=RGBA(71, 85, 105, 1)",
     });
@@ -280,7 +285,7 @@ const generatePowerAppsYAML = (activeComponentName, settings) => {
 
   if (type === "button") {
     return yamlControl(0, "CustomButton", "Button", {
-      Text: `="${settings.text}"`,
+      Text: `="${sanitizeYamlText(settings.text)}"`,
       Fill: `=${settings.fillColor}`,
       Color: `=${settings.textColor}`,
       RadiusTopLeft: `=${settings.radius}`,
@@ -302,7 +307,7 @@ const generatePowerAppsYAML = (activeComponentName, settings) => {
         ? "RGBA(21, 128, 61, 1)"
         : "RGBA(29, 78, 216, 1)";
     const children = yamlControl(6, "BadgeLabel", "Label", {
-      Text: `="${settings.text.toUpperCase()}"`,
+      Text: `="${sanitizeYamlText(settings.text).toUpperCase()}"`,
       Color: `=${textColors}`,
       FontWeight: "=FontWeight.Bold",
       Size: "=10",
@@ -332,8 +337,9 @@ const generatePowerAppsYAML = (activeComponentName, settings) => {
     let outerChildren = "";
     settings.items.forEach((item, index) => {
       const grandchild = yamlControl(12, `AccLabel_${index}`, "Label", {
-        Text: `="${item.title}"`,
+        Text: `="${sanitizeYamlText(item.title)}"`,
         X: "=15",
+        Width: "=370",
         VerticalAlign: "=VerticalAlign.Middle",
         Height: "=50",
       });
@@ -357,6 +363,7 @@ const generatePowerAppsYAML = (activeComponentName, settings) => {
       "GroupContainer",
       {
         Width: "=400",
+        Height: `=${settings.items.length * 60}`,
       },
       outerChildren,
       "ManualLayout",
@@ -365,7 +372,7 @@ const generatePowerAppsYAML = (activeComponentName, settings) => {
 
   if (type === "shell") {
     const children = yamlControl(6, "AppTitle", "Label", {
-      Text: `="${settings.appName}"`,
+      Text: `="${sanitizeYamlText(settings.appName)}"`,
       Color: "=RGBA(255, 255, 255, 1)",
       X: "=20",
       Y: "=20",
@@ -378,7 +385,7 @@ const generatePowerAppsYAML = (activeComponentName, settings) => {
       "GroupContainer",
       {
         Fill: `=${settings.primaryColor}`,
-        Width: "=Parent.Width",
+        Width: "=1366",
         Height: "=80",
       },
       children,
