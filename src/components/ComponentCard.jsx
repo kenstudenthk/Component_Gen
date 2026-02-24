@@ -11,10 +11,37 @@ export default function ComponentCard({ component }) {
   const [settings, setSettings] = useState(null);
 
   useEffect(() => {
+    // Map category slugs to component types expected by Preview/Settings
+    const typeMap = {
+      "buttons": "button",
+      "forms": "form",
+      "badges": "badge",
+      "accordions": "accordion",
+      "shells": "shell"
+    };
+    
+    const mappedType = typeMap[component.category_slug] || component.category_slug || "button";
+
     // Try to find default settings in INITIAL_TEMPLATES by name
-    const defaultSettings = INITIAL_TEMPLATES[component.name] || 
-                            INITIAL_TEMPLATES[component.name.replace(/Classic Button/i, "Classic Button")] || 
-                            { type: component.category_slug || "button", text: component.name };
+    let defaultSettings = INITIAL_TEMPLATES[component.name] || 
+                          INITIAL_TEMPLATES[component.name.replace(/Classic Button/i, "Classic Button")];
+                          
+    if (!defaultSettings) {
+      // Fallback with robust default properties based on type
+      if (mappedType === "button") {
+        defaultSettings = { type: "button", text: component.name, fillColor: "RGBA(59, 130, 246, 1)", textColor: "RGBA(255, 255, 255, 1)", radius: 4, width: 160 };
+      } else if (mappedType === "badge") {
+        defaultSettings = { type: "badge", text: component.name, theme: "success" };
+      } else if (mappedType === "form") {
+        defaultSettings = { type: "form", title: component.name, subtitle: "Description", fields: [], primaryButtonText: "Submit", secondaryButtonText: "Cancel" };
+      } else if (mappedType === "accordion") {
+         defaultSettings = { type: "accordion", items: [{ id: "1", title: "Item 1", content: "Details" }] };
+      } else if (mappedType === "shell") {
+         defaultSettings = { type: "shell", appName: component.name, showSidebar: true, primaryColor: "RGBA(15, 23, 42, 1)" };
+      } else {
+         defaultSettings = { type: mappedType, text: component.name };
+      }
+    }
     
     setSettings({
       ...defaultSettings,
