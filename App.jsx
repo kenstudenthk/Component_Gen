@@ -22,12 +22,13 @@ import {
   Loader2,
   Sparkles,
   Palette,
+  Save,
 } from "lucide-react";
 
 const apiKey = ""; // Provided by environment
 
 // --- Component Templates ---
-const TEMPLATES = {
+const INITIAL_TEMPLATES = {
   "Dynamic Form Card": {
     type: "form",
     title: "Deploy to production",
@@ -73,9 +74,59 @@ const TEMPLATES = {
     showSidebar: true,
     primaryColor: "RGBA(15, 23, 42, 1)",
   },
+  "Classic Button": {
+    type: "button",
+    text: "Button",
+    fillColor: "RGBA(59, 130, 246, 1)",
+    textColor: "RGBA(255, 255, 255, 1)",
+    radius: 4,
+  },
+  "Classic Icon Button": {
+    type: "button",
+    text: "Settings",
+    icon: "Settings",
+    iconPosition: "left",
+    fillColor: "RGBA(59, 130, 246, 1)",
+    textColor: "RGBA(255, 255, 255, 1)",
+    radius: 4,
+  },
+  "Outline Button": {
+    type: "button",
+    text: "Outline",
+    fillColor: "RGBA(255, 255, 255, 0)",
+    textColor: "RGBA(59, 130, 246, 1)",
+    borderColor: "RGBA(59, 130, 246, 1)",
+    borderThickness: 2,
+    radius: 4,
+  },
+  "Loading Button": {
+    type: "button",
+    text: "Submit",
+    loadingState: false,
+    spinnerColor: "RGBA(255, 255, 255, 1)",
+    fillColor: "RGBA(59, 130, 246, 1)",
+    textColor: "RGBA(255, 255, 255, 1)",
+    radius: 4,
+  },
+  "Gradient Button": {
+    type: "button",
+    text: "Premium",
+    gradientStartColor: "RGBA(124, 58, 237, 1)",
+    gradientEndColor: "RGBA(192, 38, 211, 1)",
+    textColor: "RGBA(255, 255, 255, 1)",
+    radius: 8,
+  },
+  "Button Raised": {
+    type: "button",
+    text: "Elevated",
+    fillColor: "RGBA(59, 130, 246, 1)",
+    textColor: "RGBA(255, 255, 255, 1)",
+    dropShadow: true,
+    radius: 4,
+  },
 };
 
-const SIDEBAR_ITEMS = [
+const INITIAL_SIDEBAR_ITEMS = [
   {
     group: "Other Resources",
     items: [
@@ -104,6 +155,12 @@ const SIDEBAR_ITEMS = [
       { label: "Accordions", icon: Box },
       { label: "Badge", icon: Box },
       { label: "Buttons", icon: Box },
+      { label: "Classic Button", icon: Box },
+      { label: "Classic Icon Button", icon: Box },
+      { label: "Outline Button", icon: Box },
+      { label: "Loading Button", icon: Box },
+      { label: "Gradient Button", icon: Box },
+      { label: "Button Raised", icon: Box },
       { label: "Dynamic Form Card", icon: Layout },
       { label: "App Shells", icon: AppWindow },
     ],
@@ -284,17 +341,29 @@ const generatePowerAppsYAML = (activeComponentName, settings) => {
   }
 
   if (type === "button") {
-    return yamlControl(0, "CustomButton", "Button", {
+    const props = {
       Text: `="${sanitizeYamlText(settings.text)}"`,
-      Fill: `=${settings.fillColor}`,
-      Color: `=${settings.textColor}`,
-      RadiusTopLeft: `=${settings.radius}`,
-      RadiusTopRight: `=${settings.radius}`,
-      RadiusBottomLeft: `=${settings.radius}`,
-      RadiusBottomRight: `=${settings.radius}`,
-      Width: `=${settings.width}`,
+      Fill: `=${settings.fillColor || "RGBA(59, 130, 246, 1)"}`,
+      Color: `=${settings.textColor || "RGBA(255, 255, 255, 1)"}`,
+      RadiusTopLeft: `=${settings.radius || 4}`,
+      RadiusTopRight: `=${settings.radius || 4}`,
+      RadiusBottomLeft: `=${settings.radius || 4}`,
+      RadiusBottomRight: `=${settings.radius || 4}`,
+      Width: `=${settings.width || 160}`,
       Height: "=40",
-    });
+    };
+
+    if (settings.borderColor) props.BorderColor = `=${settings.borderColor}`;
+    if (settings.borderThickness) props.BorderThickness = `=${settings.borderThickness}`;
+    if (settings.dropShadow) props.DropShadow = "=DropShadow.Regular";
+    
+    // For Icons (simple implementation)
+    if (settings.icon) {
+      // In a real Power App YAML, icons are separate controls, but we'll stick to button properties for now
+      // or we could wrap it in a container. For simplicity, we'll keep it as a button.
+    }
+
+    return yamlControl(0, "CustomButton", "Button", props);
   }
 
   if (type === "badge") {
@@ -397,18 +466,97 @@ const generatePowerAppsYAML = (activeComponentName, settings) => {
 };
 
 export default function App() {
+  const [templates, setTemplates] = useState(INITIAL_TEMPLATES);
+  const [sidebarItems, setSidebarItems] = useState(INITIAL_SIDEBAR_ITEMS);
   const [activeComponent, setActiveComponent] = useState("Dynamic Form Card");
-  const [settings, setSettings] = useState(TEMPLATES["Dynamic Form Card"]);
+  const [settings, setSettings] = useState(INITIAL_TEMPLATES["Dynamic Form Card"]);
   const [activeTab, setActiveTab] = useState("Settings");
   const [copied, setCopied] = useState(false);
   const [aiLoading, setAiLoading] = useState(false);
   const [aiPrompt, setAiPrompt] = useState("");
   const [error, setError] = useState("");
+  const [isLoadingComponents, setIsLoadingComponents] = useState(true);
+  const [isSaving, setIsSaving] = useState(false);
+  const [saveSuccess, setSaveSuccess] = useState(false);
+
+  const fetchComponents = async () => {
+    setIsLoadingComponents(true);
+    try {
+      const response = await fetch("/api/components");
+      if (!response.ok) throw new Error("Failed to fetch components");
+      const data = await response.json();
+
+      const newTemplates = { ...INITIAL_TEMPLATES };
+      const newSidebarItems = JSON.parse(JSON.stringify(INITIAL_SIDEBAR_ITEMS));
+      const libGroup = newSidebarItems.find((g) => g.group === "Your Libraries");
+
+      data.forEach((comp) => {
+        newTemplates[comp.name] = {
+          type: comp.category_slug || "form",
+          yaml: comp.yaml,
+          description: comp.description,
+          isD1: true,
+        };
+        if (libGroup && !libGroup.items.some((i) => i.label === comp.name)) {
+          libGroup.items.push({ label: comp.name, icon: Layers });
+        }
+      });
+
+      setTemplates(newTemplates);
+      setSidebarItems(newSidebarItems);
+    } catch (err) {
+      console.error("Fetch error:", err);
+      setError("Failed to load components from database.");
+    } finally {
+      setIsLoadingComponents(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchComponents();
+  }, []);
+
+  const handleSaveToD1 = async () => {
+    setIsSaving(true);
+    setSaveSuccess(false);
+    setError("");
+    try {
+      const yaml = generatePowerAppsYAML(activeComponent, settings);
+      
+      const payload = {
+        name: activeComponent,
+        category_slug: settings.type || "uncategorized",
+        description: `Generated ${activeComponent} configuration`,
+        yaml: yaml,
+        tags: [settings.type],
+        sort_order: 0
+      };
+
+      const response = await fetch('/api/components', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to save component to D1');
+      }
+
+      setSaveSuccess(true);
+      setTimeout(() => setSaveSuccess(false), 3000);
+      await fetchComponents(); // Refresh UI
+    } catch (err) {
+      console.error(err);
+      setError("Failed to save component to Cloudflare D1.");
+    } finally {
+      setIsSaving(false);
+    }
+  };
 
   const handleComponentSelect = (label) => {
-    if (TEMPLATES[label]) {
+    if (templates[label]) {
       setActiveComponent(label);
-      setSettings(TEMPLATES[label]);
+      setSettings(templates[label]);
     } else {
       setActiveComponent(label);
       setSettings({ type: "placeholder", label: label });
@@ -567,7 +715,12 @@ export default function App() {
           <ChevronRight className="w-4 h-4 text-slate-500 ml-auto" />
         </div>
         <nav className="flex-1 p-4 space-y-6">
-          {SIDEBAR_ITEMS.map((group, idx) => (
+          {isLoadingComponents && (
+            <div className="flex items-center justify-center py-4">
+              <Loader2 className="w-5 h-5 animate-spin text-blue-500" />
+            </div>
+          )}
+          {sidebarItems.map((group, idx) => (
             <div key={idx}>
               <h3 className="text-[11px] uppercase tracking-widest text-slate-500 font-bold mb-3 px-2">
                 {group.group}
@@ -619,6 +772,20 @@ export default function App() {
             <div className="flex items-center gap-2">
               <button className="p-2 hover:bg-slate-700 rounded-lg text-slate-400">
                 <Sun className="w-4 h-4" />
+              </button>
+              <button
+                disabled={isSaving}
+                onClick={handleSaveToD1}
+                className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-500 disabled:bg-slate-700 text-white text-xs font-bold px-4 py-2 rounded-lg border border-indigo-500/20 transition-all active:scale-95"
+              >
+                {saveSuccess ? (
+                  <Check className="w-4 h-4 text-emerald-400" />
+                ) : isSaving ? (
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                ) : (
+                  <Save className="w-4 h-4" />
+                )}
+                {saveSuccess ? "Saved!" : isSaving ? "Saving..." : "Save to Library"}
               </button>
               <button
                 onClick={copyToClipboard}
