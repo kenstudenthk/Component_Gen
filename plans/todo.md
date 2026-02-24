@@ -53,11 +53,11 @@ To allow me to commit these files to the main branch, **you must approve this pl
 - [x] Add the "Button Raised" template structure.
 
 ## Phase 7: Component Card UI Update (Edit/Preview Toggle)
-- [ ] Remove the global Preview/Settings tab bar.
-- [ ] Add an "Edit / Preview" segmented control toggle (flipping left/right) onto the component card header.
-- [ ] Build a dynamic settings panel in "Edit" mode that conditionally renders input fields based on the component's unique properties.
-- [ ] Implement settings inputs for `type: "form"` (title, subtitle, fields).
-- [ ] Implement settings inputs for `type: "badge"` (text, theme).
-- [ ] Implement settings inputs for `type: "accordion"` (items list).
-- [ ] Implement settings inputs for `type: "shell"` (appName, showSidebar, primaryColor).
-- [ ] Implement settings inputs for `type: "button"` based on existing properties dynamically (fillColor, textColor, borderColor, gradientStartColor, icon, dropShadow, loadingState, etc.).
+- [x] Remove the global Preview/Settings tab bar.
+- [x] Add an "Edit / Preview" segmented control toggle (flipping left/right) onto the component card header.
+- [x] Build a dynamic settings panel in "Edit" mode that conditionally renders input fields based on the component's unique properties.
+- [x] Implement settings inputs for `type: "form"` (title, subtitle, fields).
+- [x] Implement settings inputs for `type: "badge"` (text, theme).
+- [x] Implement settings inputs for `type: "accordion"` (items list).
+- [x] Implement settings inputs for `type: "shell"` (appName, showSidebar, primaryColor).
+- [x] Implement settings inputs for `type: "button"` based on existing properties dynamically (fillColor, textColor, borderColor, gradientStartColor, icon, dropShadow, loadingState, etc.).

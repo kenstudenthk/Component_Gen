@@ -776,10 +776,32 @@ export default function App() {
                 <span className="bg-emerald-500/10 text-emerald-500 text-[10px] font-bold px-2 py-0.5 rounded uppercase border border-emerald-500/20 tracking-wider">
                   Free
                 </span>
-                <span className="text-slate-600 text-xs font-medium ml-2">
-                  Updated Sep 1, 2025
-                </span>
               </div>
+
+              {/* Edit / Preview Toggle */}
+              <div className="flex bg-[#0D0D0D] rounded-xl border border-white/5 p-1">
+                <button
+                  onClick={() => setActiveTab("Preview")}
+                  className={`px-6 py-2 rounded-lg text-sm font-bold transition-all ${
+                    activeTab === "Preview"
+                      ? "bg-[#1A1A1A] text-white shadow-sm border border-white/5"
+                      : "text-slate-500 hover:text-slate-300"
+                  }`}
+                >
+                  Preview
+                </button>
+                <button
+                  onClick={() => setActiveTab("Settings")}
+                  className={`px-6 py-2 rounded-lg text-sm font-bold transition-all ${
+                    activeTab === "Settings"
+                      ? "bg-[#1A1A1A] text-white shadow-sm border border-white/5"
+                      : "text-slate-500 hover:text-slate-300"
+                  }`}
+                >
+                  Edit
+                </button>
+              </div>
+
               <div className="flex items-center gap-3">
                 <div className="flex items-center bg-[#0D0D0D] rounded-xl border border-white/5 p-1 mr-2">
                   <button className="p-2 text-blue-400">
@@ -811,36 +833,6 @@ export default function App() {
                   {copied ? "Copied!" : "Copy YAML"}
                 </button>
               </div>
-            </div>
-
-            {/* Tabs */}
-            <div className="flex px-8 border-b border-white/5 bg-[#121212]">
-              <button
-                onClick={() => setActiveTab("Preview")}
-                className={`py-4 px-6 text-sm font-bold transition-all relative ${
-                  activeTab === "Preview"
-                    ? "text-white"
-                    : "text-slate-500 hover:text-slate-300"
-                }`}
-              >
-                Preview
-                {activeTab === "Preview" && (
-                  <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-blue-500 mx-6" />
-                )}
-              </button>
-              <button
-                onClick={() => setActiveTab("Settings")}
-                className={`py-4 px-6 text-sm font-bold transition-all relative ${
-                  activeTab === "Settings"
-                    ? "text-white"
-                    : "text-slate-500 hover:text-slate-300"
-                }`}
-              >
-                Settings
-                {activeTab === "Settings" && (
-                  <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-blue-500 mx-6" />
-                )}
-              </button>
             </div>
 
             {/* Content Area */}
@@ -899,7 +891,7 @@ export default function App() {
                       </h3>
                       <div className="space-y-4">
                         <div className="space-y-2">
-                          <label className="text-xs font-bold text-slate-500 uppercase">
+                          <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">
                             Title
                           </label>
                           <input
@@ -911,11 +903,11 @@ export default function App() {
                                 title: e.target.value,
                               })
                             }
-                            className="w-full bg-[#1c2128] border border-slate-800 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:ring-2 focus:ring-blue-600"
+                            className="w-full bg-[#1A1A1A] border border-white/5 rounded-xl px-4 py-3.5 text-sm text-white focus:outline-none focus:ring-1 focus:ring-blue-600"
                           />
                         </div>
                         <div className="space-y-2">
-                          <label className="text-xs font-bold text-slate-500 uppercase">
+                          <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">
                             Subtitle
                           </label>
                           <textarea
@@ -927,7 +919,7 @@ export default function App() {
                                 subtitle: e.target.value,
                               })
                             }
-                            className="w-full bg-[#1c2128] border border-slate-800 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:ring-2 focus:ring-blue-600 resize-none"
+                            className="w-full bg-[#1A1A1A] border border-white/5 rounded-xl px-4 py-3.5 text-sm text-white focus:outline-none focus:ring-1 focus:ring-blue-600 resize-none"
                           />
                         </div>
                       </div>
@@ -939,7 +931,7 @@ export default function App() {
                         </h3>
                         <button
                           onClick={handleAddField}
-                          className="flex items-center gap-1.5 bg-[#1c2128] hover:bg-slate-700 text-slate-300 text-xs font-bold px-3 py-1.5 rounded-lg border border-slate-700 transition-colors"
+                          className="flex items-center gap-1.5 bg-[#1A1A1A] hover:bg-white/5 text-slate-300 text-xs font-bold px-3 py-1.5 rounded-lg border border-white/5 transition-colors"
                         >
                           <Plus className="w-3.5 h-3.5" />
                           Add Field
@@ -949,10 +941,10 @@ export default function App() {
                         {settings.fields.map((field) => (
                           <div
                             key={field.id}
-                            className="bg-[#16191e] border border-slate-800 rounded-xl p-4 flex gap-4 items-end"
+                            className="bg-[#1A1A1A] border border-white/5 rounded-xl p-4 flex gap-4 items-end"
                           >
                             <div className="flex-1 space-y-2">
-                              <label className="text-[10px] font-bold text-slate-500 uppercase">
+                              <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">
                                 Label
                               </label>
                               <input
@@ -961,11 +953,11 @@ export default function App() {
                                 onChange={(e) =>
                                   updateField(field.id, "label", e.target.value)
                                 }
-                                className="w-full bg-[#1c2128] border border-slate-800 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:ring-1 focus:ring-blue-600"
+                                className="w-full bg-[#0D0D0D] border border-white/5 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:ring-1 focus:ring-blue-600"
                               />
                             </div>
                             <div className="flex-1 space-y-2">
-                              <label className="text-[10px] font-bold text-slate-500 uppercase">
+                              <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">
                                 Placeholder
                               </label>
                               <input
@@ -978,7 +970,7 @@ export default function App() {
                                     e.target.value,
                                   )
                                 }
-                                className="w-full bg-[#1c2128] border border-slate-800 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:ring-1 focus:ring-blue-600"
+                                className="w-full bg-[#0D0D0D] border border-white/5 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:ring-1 focus:ring-blue-600"
                               />
                             </div>
                             <button
@@ -1011,7 +1003,7 @@ export default function App() {
                         />
                       </div>
                       
-                      <div className="grid grid-cols-2 gap-6">
+                      {settings.fillColor !== undefined && (
                         <div className="space-y-2">
                           <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">
                             Background Color
@@ -1024,52 +1016,160 @@ export default function App() {
                             <input
                               type="text"
                               value={settings.fillColor}
-                              onChange={(e) =>
-                                setSettings({
-                                  ...settings,
-                                  fillColor: e.target.value,
-                                })
-                              }
-                              className="flex-1 bg-[#1A1A1A] border border-white/5 rounded-xl px-4 py-3 text-sm text-white"
+                              onChange={(e) => setSettings({ ...settings, fillColor: e.target.value })}
+                              className="flex-1 bg-[#1A1A1A] border border-white/5 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:ring-1 focus:ring-blue-600"
                             />
                           </div>
                         </div>
-                        <div className="space-y-2">
-                          <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">
-                            Text Color
-                          </label>
-                          <div className="flex gap-2">
-                            <div 
-                              className="w-12 h-12 rounded-xl border border-white/10 shrink-0" 
-                              style={{ backgroundColor: settings.textColor }}
-                            />
-                            <input
-                              type="text"
-                              value={settings.textColor}
-                              onChange={(e) =>
-                                setSettings({
-                                  ...settings,
-                                  textColor: e.target.value,
-                                })
-                              }
-                              className="flex-1 bg-[#1A1A1A] border border-white/5 rounded-xl px-4 py-3 text-sm text-white"
-                            />
+                      )}
+
+                      {settings.gradientStartColor !== undefined && (
+                        <div className="grid grid-cols-2 gap-6">
+                          <div className="space-y-2">
+                            <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">
+                              Gradient Start
+                            </label>
+                            <div className="flex gap-2">
+                              <div className="w-12 h-12 rounded-xl border border-white/10 shrink-0" style={{ backgroundColor: settings.gradientStartColor }} />
+                              <input
+                                type="text"
+                                value={settings.gradientStartColor}
+                                onChange={(e) => setSettings({ ...settings, gradientStartColor: e.target.value })}
+                                className="flex-1 bg-[#1A1A1A] border border-white/5 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:ring-1 focus:ring-blue-600"
+                              />
+                            </div>
+                          </div>
+                          <div className="space-y-2">
+                            <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">
+                              Gradient End
+                            </label>
+                            <div className="flex gap-2">
+                              <div className="w-12 h-12 rounded-xl border border-white/10 shrink-0" style={{ backgroundColor: settings.gradientEndColor }} />
+                              <input
+                                type="text"
+                                value={settings.gradientEndColor}
+                                onChange={(e) => setSettings({ ...settings, gradientEndColor: e.target.value })}
+                                className="flex-1 bg-[#1A1A1A] border border-white/5 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:ring-1 focus:ring-blue-600"
+                              />
+                            </div>
                           </div>
                         </div>
-                      </div>
+                      )}
 
                       <div className="space-y-2">
                         <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">
-                          Border Radius (px)
+                          Text Color
                         </label>
-                        <input
-                          type="number"
-                          value={settings.radius}
-                          onChange={(e) =>
-                            setSettings({ ...settings, radius: parseInt(e.target.value) || 0 })
-                          }
-                          className="w-full bg-[#1A1A1A] border border-white/5 rounded-xl px-4 py-3.5 text-sm text-white"
-                        />
+                        <div className="flex gap-2">
+                          <div 
+                            className="w-12 h-12 rounded-xl border border-white/10 shrink-0" 
+                            style={{ backgroundColor: settings.textColor }}
+                          />
+                          <input
+                            type="text"
+                            value={settings.textColor}
+                            onChange={(e) => setSettings({ ...settings, textColor: e.target.value })}
+                            className="flex-1 bg-[#1A1A1A] border border-white/5 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:ring-1 focus:ring-blue-600"
+                          />
+                        </div>
+                      </div>
+
+                      {settings.borderColor !== undefined && (
+                        <div className="grid grid-cols-2 gap-6">
+                          <div className="space-y-2">
+                            <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">
+                              Border Color
+                            </label>
+                            <div className="flex gap-2">
+                              <div className="w-12 h-12 rounded-xl border border-white/10 shrink-0" style={{ backgroundColor: settings.borderColor }} />
+                              <input type="text" value={settings.borderColor} onChange={(e) => setSettings({ ...settings, borderColor: e.target.value })} className="flex-1 bg-[#1A1A1A] border border-white/5 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:ring-1 focus:ring-blue-600" />
+                            </div>
+                          </div>
+                          <div className="space-y-2">
+                            <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">
+                              Border Thickness (px)
+                            </label>
+                            <input type="number" value={settings.borderThickness} onChange={(e) => setSettings({ ...settings, borderThickness: parseInt(e.target.value) || 0 })} className="w-full bg-[#1A1A1A] border border-white/5 rounded-xl px-4 py-3.5 text-sm text-white focus:outline-none focus:ring-1 focus:ring-blue-600" />
+                          </div>
+                        </div>
+                      )}
+                      
+                      {settings.icon !== undefined && (
+                        <div className="grid grid-cols-2 gap-6">
+                          <div className="space-y-2">
+                            <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">
+                              Icon Name
+                            </label>
+                            <input type="text" value={settings.icon} onChange={(e) => setSettings({ ...settings, icon: e.target.value })} className="w-full bg-[#1A1A1A] border border-white/5 rounded-xl px-4 py-3.5 text-sm text-white focus:outline-none focus:ring-1 focus:ring-blue-600" />
+                          </div>
+                          <div className="space-y-2">
+                            <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">
+                              Icon Position
+                            </label>
+                            <select value={settings.iconPosition} onChange={(e) => setSettings({ ...settings, iconPosition: e.target.value })} className="w-full bg-[#1A1A1A] border border-white/5 rounded-xl px-4 py-3.5 text-sm text-white focus:outline-none focus:ring-1 focus:ring-blue-600">
+                              <option value="left">Left</option>
+                              <option value="right">Right</option>
+                            </select>
+                          </div>
+                        </div>
+                      )}
+
+                      {settings.loadingState !== undefined && (
+                        <div className="grid grid-cols-2 gap-6">
+                          <div className="space-y-2">
+                            <label className="text-xs font-bold text-slate-500 uppercase tracking-wider flex items-center gap-2 h-full mt-4">
+                              <input type="checkbox" checked={settings.loadingState} onChange={(e) => setSettings({ ...settings, loadingState: e.target.checked })} className="rounded bg-[#1A1A1A] border-white/10 w-4 h-4" />
+                              Loading State Enabled
+                            </label>
+                          </div>
+                          <div className="space-y-2">
+                            <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">
+                              Spinner Color
+                            </label>
+                            <div className="flex gap-2">
+                              <div className="w-12 h-12 rounded-xl border border-white/10 shrink-0" style={{ backgroundColor: settings.spinnerColor }} />
+                              <input type="text" value={settings.spinnerColor} onChange={(e) => setSettings({ ...settings, spinnerColor: e.target.value })} className="flex-1 bg-[#1A1A1A] border border-white/5 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:ring-1 focus:ring-blue-600" />
+                            </div>
+                          </div>
+                        </div>
+                      )}
+
+                      {settings.dropShadow !== undefined && (
+                        <div className="space-y-2">
+                          <label className="text-xs font-bold text-slate-500 uppercase tracking-wider flex items-center gap-2">
+                            <input type="checkbox" checked={settings.dropShadow} onChange={(e) => setSettings({ ...settings, dropShadow: e.target.checked })} className="rounded bg-[#1A1A1A] border-white/10 w-4 h-4" />
+                            Drop Shadow Enabled
+                          </label>
+                        </div>
+                      )}
+
+                      <div className="grid grid-cols-2 gap-6">
+                        {settings.width !== undefined && (
+                          <div className="space-y-2">
+                            <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">
+                              Width (px)
+                            </label>
+                            <input
+                              type="number"
+                              value={settings.width}
+                              onChange={(e) => setSettings({ ...settings, width: parseInt(e.target.value) || 0 })}
+                              className="w-full bg-[#1A1A1A] border border-white/5 rounded-xl px-4 py-3.5 text-sm text-white focus:outline-none focus:ring-1 focus:ring-blue-600"
+                            />
+                          </div>
+                        )}
+                        <div className="space-y-2">
+                          <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">
+                            Border Radius (px)
+                          </label>
+                          <input
+                            type="number"
+                            value={settings.radius}
+                            onChange={(e) =>
+                              setSettings({ ...settings, radius: parseInt(e.target.value) || 0 })
+                            }
+                            className="w-full bg-[#1A1A1A] border border-white/5 rounded-xl px-4 py-3.5 text-sm text-white focus:outline-none focus:ring-1 focus:ring-blue-600"
+                          />
+                        </div>
                       </div>
                     </div>
 
@@ -1087,7 +1187,7 @@ export default function App() {
                     </h3>
                     <div className="space-y-4">
                       <div className="space-y-2">
-                        <label className="text-xs font-bold text-slate-500 uppercase">
+                        <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">
                           App Name
                         </label>
                         <input
@@ -1099,25 +1199,140 @@ export default function App() {
                               appName: e.target.value,
                             })
                           }
-                          className="w-full bg-[#1c2128] border border-slate-800 rounded-lg px-4 py-2.5 text-sm text-white"
+                          className="w-full bg-[#1A1A1A] border border-white/5 rounded-xl px-4 py-3.5 text-sm text-white focus:outline-none focus:ring-1 focus:ring-blue-600"
                         />
                       </div>
                       <div className="space-y-2">
-                        <label className="text-xs font-bold text-slate-500 uppercase">
+                        <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">
                           Header Color
+                        </label>
+                        <div className="flex gap-2">
+                          <div 
+                            className="w-12 h-12 rounded-xl border border-white/10 shrink-0" 
+                            style={{ backgroundColor: settings.primaryColor }}
+                          />
+                          <input
+                            type="text"
+                            value={settings.primaryColor}
+                            onChange={(e) =>
+                              setSettings({
+                                ...settings,
+                                primaryColor: e.target.value,
+                              })
+                            }
+                            className="flex-1 bg-[#1A1A1A] border border-white/5 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:ring-1 focus:ring-blue-600"
+                          />
+                        </div>
+                      </div>
+                      <div className="space-y-2 mt-4">
+                        <label className="text-xs font-bold text-slate-500 uppercase tracking-wider flex items-center gap-2">
+                          <input type="checkbox" checked={settings.showSidebar !== false} onChange={(e) => setSettings({ ...settings, showSidebar: e.target.checked })} className="rounded bg-[#1A1A1A] border-white/10 w-4 h-4" />
+                          Show Sidebar
+                        </label>
+                      </div>
+                    </div>
+                  </section>
+                )}
+
+                {settings.type === "badge" && (
+                  <section className="space-y-6">
+                    <h3 className="text-lg font-bold text-white mb-4">
+                      Badge Settings
+                    </h3>
+                    <div className="space-y-4">
+                      <div className="space-y-2">
+                        <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">
+                          Badge Text
                         </label>
                         <input
                           type="text"
-                          value={settings.primaryColor}
-                          onChange={(e) =>
-                            setSettings({
-                              ...settings,
-                              primaryColor: e.target.value,
-                            })
-                          }
-                          className="w-full bg-[#1c2128] border border-slate-800 rounded-lg px-4 py-2.5 text-sm text-white"
+                          value={settings.text}
+                          onChange={(e) => setSettings({ ...settings, text: e.target.value })}
+                          className="w-full bg-[#1A1A1A] border border-white/5 rounded-xl px-4 py-3.5 text-sm text-white focus:outline-none focus:ring-1 focus:ring-blue-600"
                         />
                       </div>
+                      <div className="space-y-2">
+                        <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">
+                          Theme
+                        </label>
+                        <select
+                          value={settings.theme}
+                          onChange={(e) => setSettings({ ...settings, theme: e.target.value })}
+                          className="w-full bg-[#1A1A1A] border border-white/5 rounded-xl px-4 py-3.5 text-sm text-white focus:outline-none focus:ring-1 focus:ring-blue-600"
+                        >
+                          <option value="success">Success</option>
+                          <option value="warning">Warning</option>
+                          <option value="error">Error</option>
+                          <option value="info">Info</option>
+                        </select>
+                      </div>
+                    </div>
+                  </section>
+                )}
+
+                {settings.type === "accordion" && (
+                  <section className="space-y-6">
+                    <div className="flex justify-between items-center mb-4">
+                      <h3 className="text-lg font-bold text-white">
+                        Accordion Items
+                      </h3>
+                      <button
+                        onClick={() => {
+                          const newItems = [...(settings.items || []), { id: Date.now().toString(), title: "New Item", content: "Details here" }];
+                          setSettings({ ...settings, items: newItems });
+                        }}
+                        className="flex items-center gap-1.5 bg-[#1A1A1A] hover:bg-white/5 text-slate-300 text-xs font-bold px-3 py-1.5 rounded-lg border border-white/5 transition-colors"
+                      >
+                        <Plus className="w-3.5 h-3.5" />
+                        Add Item
+                      </button>
+                    </div>
+                    <div className="space-y-3">
+                      {(settings.items || []).map((item, index) => (
+                        <div key={item.id} className="bg-[#1A1A1A] border border-white/5 rounded-xl p-4 flex flex-col gap-4">
+                          <div className="flex gap-4 items-end">
+                            <div className="flex-1 space-y-2">
+                              <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">
+                                Title
+                              </label>
+                              <input
+                                type="text"
+                                value={item.title}
+                                onChange={(e) => {
+                                  const newItems = [...settings.items];
+                                  newItems[index].title = e.target.value;
+                                  setSettings({ ...settings, items: newItems });
+                                }}
+                                className="w-full bg-[#0D0D0D] border border-white/5 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:ring-1 focus:ring-blue-600"
+                              />
+                            </div>
+                            <button
+                              onClick={() => {
+                                const newItems = settings.items.filter((i) => i.id !== item.id);
+                                setSettings({ ...settings, items: newItems });
+                              }}
+                              className="p-2.5 hover:bg-red-500/10 text-slate-500 hover:text-red-500 rounded-lg transition-colors border border-transparent hover:border-red-500/20"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </button>
+                          </div>
+                          <div className="w-full space-y-2">
+                            <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">
+                              Content
+                            </label>
+                            <textarea
+                              rows={2}
+                              value={item.content}
+                              onChange={(e) => {
+                                const newItems = [...settings.items];
+                                newItems[index].content = e.target.value;
+                                setSettings({ ...settings, items: newItems });
+                              }}
+                              className="w-full bg-[#0D0D0D] border border-white/5 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:ring-1 focus:ring-blue-600 resize-none"
+                            />
+                          </div>
+                        </div>
+                      ))}
                     </div>
                   </section>
                 )}
@@ -1165,14 +1380,49 @@ export default function App() {
                     <button
                       style={{
                         backgroundColor: settings.fillColor,
+                        background: settings.gradientStartColor ? `linear-gradient(to right, ${settings.gradientStartColor}, ${settings.gradientEndColor})` : settings.fillColor,
                         color: settings.textColor,
                         borderRadius: `${settings.radius}px`,
-                        width: `${settings.width || 160}px`,
+                        width: settings.width ? `${settings.width}px` : "auto",
+                        border: settings.borderColor ? `${settings.borderThickness || 1}px solid ${settings.borderColor}` : "none",
+                        boxShadow: settings.dropShadow ? "0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)" : "none",
                       }}
-                      className="py-3 px-8 font-bold shadow-sm transition-all active:scale-95"
+                      className="py-3 px-8 font-bold shadow-sm transition-all active:scale-95 flex items-center justify-center gap-2"
+                    >
+                      {settings.loadingState && <Loader2 className="w-4 h-4 animate-spin" />}
+                      {settings.icon && settings.iconPosition === "left" && <Box className="w-4 h-4" />}
+                      {settings.text}
+                      {settings.icon && settings.iconPosition === "right" && <Box className="w-4 h-4" />}
+                    </button>
+                  )}
+                  {settings.type === "badge" && (
+                    <span
+                      className={`px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider ${
+                        settings.theme === "success" ? "bg-emerald-100 text-emerald-700 border border-emerald-200" :
+                        settings.theme === "warning" ? "bg-amber-100 text-amber-700 border border-amber-200" :
+                        settings.theme === "error" ? "bg-red-100 text-red-700 border border-red-200" :
+                        "bg-blue-100 text-blue-700 border border-blue-200"
+                      }`}
                     >
                       {settings.text}
-                    </button>
+                    </span>
+                  )}
+                  {settings.type === "accordion" && (
+                    <div className="w-full max-w-md bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm">
+                      {(settings.items || []).map((item, idx) => (
+                        <div key={item.id} className={`border-b border-slate-100 last:border-0`}>
+                          <div className="p-4 flex justify-between items-center font-bold text-slate-800 cursor-pointer">
+                            {item.title}
+                            <ChevronRight className={`w-4 h-4 transition-transform ${idx === 0 ? "rotate-90" : ""}`} />
+                          </div>
+                          {idx === 0 && (
+                            <div className="px-4 pb-4 text-sm text-slate-500">
+                              {item.content}
+                            </div>
+                          )}
+                        </div>
+                      ))}
+                    </div>
                   )}
                   {settings.type === "shell" && (
                     <div className="w-full h-full max-h-[400px] bg-white shadow-xl flex flex-col rounded-lg overflow-hidden border border-slate-200">
