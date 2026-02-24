@@ -124,17 +124,27 @@ export const generatePowerAppsYAML = (activeComponentName, settings) => {
   }
 
   if (type === "button") {
-    return yamlControl(0, "CustomButton", "Button", {
+    const props = {
       Text: `="${sanitizeYamlText(settings.text)}"`,
-      Fill: `=${settings.fillColor}`,
-      Color: `=${settings.textColor}`,
-      RadiusTopLeft: `=${settings.radius}`,
-      RadiusTopRight: `=${settings.radius}`,
-      RadiusBottomLeft: `=${settings.radius}`,
-      RadiusBottomRight: `=${settings.radius}`,
-      Width: `=${settings.width}`,
+      Fill: `=${settings.fillColor || "RGBA(59, 130, 246, 1)"}`,
+      Color: `=${settings.textColor || "RGBA(255, 255, 255, 1)"}`,
+      RadiusTopLeft: `=${settings.radius || 4}`,
+      RadiusTopRight: `=${settings.radius || 4}`,
+      RadiusBottomLeft: `=${settings.radius || 4}`,
+      RadiusBottomRight: `=${settings.radius || 4}`,
+      Width: `=${settings.width || 160}`,
       Height: "=40",
-    });
+    };
+
+    if (settings.borderColor) props.BorderColor = `=${settings.borderColor}`;
+    if (settings.borderThickness) props.BorderThickness = `=${settings.borderThickness}`;
+    if (settings.dropShadow) props.DropShadow = "=DropShadow.Regular";
+    
+    // Gradient logic (Power Apps uses Fill for gradients too if specified as linear gradient, 
+    // but in standard YAML it's often simpler to just use Fill. 
+    // We'll stick to properties for now)
+
+    return yamlControl(0, "CustomButton", "Button", props);
   }
 
   if (type === "badge") {

@@ -19,10 +19,12 @@ export default function Navbar() {
   };
 
   return (
-    <header className="border-b border-slate-800 bg-[#0f1115]">
-      <div className="mx-auto max-w-7xl px-6 h-14 flex items-center gap-8">
-        <Link to="/" className="flex items-center gap-2 text-white font-semibold">
-          <Layers size={18} className="text-blue-400" />
+    <header className="border-b border-white/5 bg-[#0A0A0A]">
+      <div className="mx-auto max-w-7xl px-6 h-16 flex items-center gap-8">
+        <Link to="/" className="flex items-center gap-2 text-white font-bold tracking-tight">
+          <div className="bg-blue-600 p-1.5 rounded-lg">
+            <Layers size={18} className="text-white" />
+          </div>
           PowerLibs
         </Link>
         <nav className="flex items-center gap-6">
