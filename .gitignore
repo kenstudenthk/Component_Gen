@@ -32,3 +32,4 @@ dist-ssr
 # Windows crash dumps
 *.stackdump
 everything-claude-code/
+\n.env

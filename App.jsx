@@ -13,6 +13,8 @@ import {
   Layers,
   Check,
   Sun,
+  Moon,
+  Calendar,
   ExternalLink,
   Code,
   ChevronDown,
@@ -25,7 +27,7 @@ import {
   Save,
 } from "lucide-react";
 
-const apiKey = ""; // Provided by environment
+const apiKey = import.meta.env.VITE_GEMINI_API_KEY || ""; // Provided by environment
 
 // --- Component Templates ---
 const INITIAL_TEMPLATES = {
@@ -702,10 +704,10 @@ export default function App() {
   };
 
   return (
-    <div className="flex h-screen bg-[#0f1115] text-slate-300 font-sans overflow-hidden">
+    <div className="flex h-screen bg-[#0A0A0A] text-slate-300 font-sans overflow-hidden">
       {/* Sidebar */}
-      <aside className="w-64 border-r border-slate-800 flex flex-col overflow-y-auto">
-        <div className="p-6 flex items-center gap-3 border-b border-slate-800 bg-[#16191e]">
+      <aside className="w-64 border-r border-white/5 flex flex-col overflow-y-auto bg-[#0F0F0F]">
+        <div className="p-6 flex items-center gap-3 border-b border-white/5 bg-[#0F0F0F]">
           <div className="bg-blue-600 p-2 rounded-lg">
             <AppWindow className="text-white w-5 h-5" />
           </div>
@@ -733,7 +735,7 @@ export default function App() {
                       className={`w-full flex items-center gap-3 px-3 py-2 rounded-md transition-colors text-sm font-medium ${
                         activeComponent === item.label
                           ? "bg-blue-600/10 text-blue-400 border border-blue-600/20"
-                          : "hover:bg-slate-800 hover:text-white text-slate-400"
+                          : "hover:bg-white/5 hover:text-white text-slate-400"
                       }`}
                     >
                       <item.icon className="w-4 h-4" />
@@ -748,135 +750,146 @@ export default function App() {
       </aside>
 
       {/* Main Content */}
-      <main className="flex-1 flex flex-col overflow-hidden">
-        <header className="px-8 py-6 border-b border-slate-800 bg-[#16191e]">
-          <div className="flex justify-between items-start mb-4">
-            <div>
-              <h1 className="text-3xl font-bold text-white mb-1">
-                Power Apps Component Builder
-              </h1>
-              <p className="text-slate-500 text-sm">
-                Design professional Canvas components with Gemini AI ✨
-              </p>
+      <main className="flex-1 overflow-y-auto px-10 py-12">
+        <div className="max-w-5xl mx-auto">
+          {/* Global Header */}
+          <header className="mb-12">
+            <h1 className="text-5xl font-bold text-white mb-4 tracking-tight">
+              Power Apps Button Components
+            </h1>
+            <p className="text-slate-400 text-lg max-w-3xl leading-relaxed">
+              Interactive buttons for Microsoft Power Apps - gradient, outline, loading, and raised styles. Copy-paste YAML code included.
+            </p>
+            <p className="text-slate-600 text-sm mt-4 flex items-center gap-2">
+              Last updated: Jan 5
+            </p>
+          </header>
+
+          {/* Component Card */}
+          <div className="bg-[#151515] border border-white/5 rounded-3xl overflow-hidden shadow-2xl">
+            {/* Component Action Bar */}
+            <div className="p-8 flex items-center justify-between border-b border-white/5">
+              <div className="flex items-center gap-4">
+                <h2 className="text-2xl font-bold text-white">
+                  {activeComponent}
+                </h2>
+                <span className="bg-emerald-500/10 text-emerald-500 text-[10px] font-bold px-2 py-0.5 rounded uppercase border border-emerald-500/20 tracking-wider">
+                  Free
+                </span>
+                <span className="text-slate-600 text-xs font-medium ml-2">
+                  Updated Sep 1, 2025
+                </span>
+              </div>
+              <div className="flex items-center gap-3">
+                <div className="flex items-center bg-[#0D0D0D] rounded-xl border border-white/5 p-1 mr-2">
+                  <button className="p-2 text-blue-400">
+                    <Sun className="w-4 h-4" />
+                  </button>
+                  <button className="p-2 text-slate-600 hover:text-slate-400">
+                    <Moon className="w-4 h-4" />
+                  </button>
+                </div>
+                
+                <button
+                  disabled={isSaving}
+                  onClick={handleSaveToD1}
+                  className="flex items-center gap-2 bg-[#1A1A1A] hover:bg-[#252525] disabled:bg-[#0D0D0D] text-slate-300 text-sm font-bold px-5 py-2.5 rounded-xl border border-white/5 transition-all"
+                >
+                  {isSaving ? (
+                    <Loader2 className="w-4 h-4 animate-spin text-blue-400" />
+                  ) : (
+                    <Save className="w-4 h-4 text-blue-400" />
+                  )}
+                  {saveSuccess ? "Saved!" : "Save"}
+                </button>
+
+                <button
+                  onClick={copyToClipboard}
+                  className="flex items-center gap-2 bg-[#1A1A1A] hover:bg-[#252525] text-slate-300 text-sm font-bold px-5 py-2.5 rounded-xl border border-white/5 transition-all"
+                >
+                  <Copy className="w-4 h-4 text-blue-400" />
+                  {copied ? "Copied!" : "Copy YAML"}
+                </button>
+              </div>
             </div>
-          </div>
-          <div className="bg-[#1c2128] rounded-xl border border-slate-800 flex items-center justify-between p-2 pl-4">
-            <div className="flex items-center gap-4">
-              <span className="font-semibold text-white text-sm">
-                {activeComponent}
-              </span>
-              <span className="bg-emerald-500/10 text-emerald-500 text-[10px] font-bold px-2 py-0.5 rounded uppercase border border-emerald-500/20">
-                Free
-              </span>
-            </div>
-            <div className="flex items-center gap-2">
-              <button className="p-2 hover:bg-slate-700 rounded-lg text-slate-400">
-                <Sun className="w-4 h-4" />
+
+            {/* Tabs */}
+            <div className="flex px-8 border-b border-white/5 bg-[#121212]">
+              <button
+                onClick={() => setActiveTab("Preview")}
+                className={`py-4 px-6 text-sm font-bold transition-all relative ${
+                  activeTab === "Preview"
+                    ? "text-white"
+                    : "text-slate-500 hover:text-slate-300"
+                }`}
+              >
+                Preview
+                {activeTab === "Preview" && (
+                  <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-blue-500 mx-6" />
+                )}
               </button>
               <button
-                disabled={isSaving}
-                onClick={handleSaveToD1}
-                className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-500 disabled:bg-slate-700 text-white text-xs font-bold px-4 py-2 rounded-lg border border-indigo-500/20 transition-all active:scale-95"
+                onClick={() => setActiveTab("Settings")}
+                className={`py-4 px-6 text-sm font-bold transition-all relative ${
+                  activeTab === "Settings"
+                    ? "text-white"
+                    : "text-slate-500 hover:text-slate-300"
+                }`}
               >
-                {saveSuccess ? (
-                  <Check className="w-4 h-4 text-emerald-400" />
-                ) : isSaving ? (
-                  <Loader2 className="w-4 h-4 animate-spin" />
-                ) : (
-                  <Save className="w-4 h-4" />
+                Settings
+                {activeTab === "Settings" && (
+                  <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-blue-500 mx-6" />
                 )}
-                {saveSuccess ? "Saved!" : isSaving ? "Saving..." : "Save to Library"}
-              </button>
-              <button
-                onClick={copyToClipboard}
-                className="flex items-center gap-2 bg-[#2d333b] hover:bg-slate-700 text-white text-xs font-bold px-4 py-2 rounded-lg border border-slate-700 transition-all active:scale-95"
-              >
-                {copied ? (
-                  <Check className="w-4 h-4 text-emerald-400" />
-                ) : (
-                  <Copy className="w-4 h-4" />
-                )}
-                {copied ? "Copied!" : "Copy YAML"}
               </button>
             </div>
-          </div>
-        </header>
 
-        <div className="flex-1 flex flex-col overflow-hidden">
-          <div className="bg-[#16191e] border-b border-slate-800 px-8 flex gap-6">
-            <button
-              onClick={() => setActiveTab("Preview")}
-              className={`py-3 px-1 text-sm font-semibold border-b-2 transition-all ${activeTab === "Preview" ? "border-blue-500 text-white" : "border-transparent text-slate-500"}`}
-            >
-              Preview
-            </button>
-            <button
-              onClick={() => setActiveTab("Settings")}
-              className={`py-3 px-1 text-sm font-semibold border-b-2 transition-all ${activeTab === "Settings" ? "border-blue-500 text-white" : "border-transparent text-slate-500"}`}
-            >
-              Settings
-            </button>
-          </div>
-
-          <div className="flex-1 overflow-y-auto bg-[#0d1014] p-8">
-            {activeTab === "Settings" ? (
-              <div className="max-w-3xl mx-auto space-y-10">
-                {/* AI Assistant Section */}
-                <section className="bg-gradient-to-br from-blue-900/20 to-purple-900/10 border border-blue-500/20 rounded-2xl p-6 shadow-xl relative overflow-hidden">
-                  <div className="absolute top-0 right-0 p-4 opacity-10">
-                    <Sparkles className="w-16 h-16" />
-                  </div>
-                  <div className="flex items-center gap-2 mb-4">
-                    <Wand2 className="w-5 h-5 text-blue-400" />
-                    <h3 className="text-lg font-bold text-white uppercase tracking-tight">
-                      Gemini Assistant
-                    </h3>
-                  </div>
-
-                  <div className="space-y-4">
-                    <p className="text-sm text-slate-400">
-                      {settings.type === "form"
-                        ? "Describe your form and Gemini will generate the fields for you."
-                        : "Describe your app's mood and Gemini will suggest a professional color palette."}
-                    </p>
-                    <div className="flex gap-2">
-                      <input
-                        type="text"
-                        placeholder={
-                          settings.type === "form"
-                            ? "e.g. Employee onboarding form..."
-                            : "e.g. Minimalist corporate dashboard..."
-                        }
-                        className="flex-1 bg-[#0d1014] border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-white focus:ring-2 focus:ring-blue-500 outline-none"
-                        value={aiPrompt}
-                        onChange={(e) => setAiPrompt(e.target.value)}
-                        onKeyDown={(e) => {
-                          if (e.key === "Enter") {
-                            settings.type === "form"
-                              ? handleAiGenerateForm()
-                              : handleAiSuggestStyles();
-                          }
-                        }}
-                      />
-                      <button
-                        disabled={aiLoading || !aiPrompt}
-                        onClick={
-                          settings.type === "form"
-                            ? handleAiGenerateForm
-                            : handleAiSuggestStyles
-                        }
-                        className="bg-blue-600 hover:bg-blue-500 disabled:bg-slate-800 disabled:text-slate-600 text-white font-bold px-6 py-2 rounded-xl transition-all flex items-center gap-2"
-                      >
-                        {aiLoading ? (
-                          <Loader2 className="w-4 h-4 animate-spin" />
-                        ) : (
-                          "✨ Generate"
-                        )}
-                      </button>
+            {/* Content Area */}
+            <div className="min-h-[500px]">
+              {activeTab === "Settings" ? (
+                <div className="p-10 space-y-10">
+                  {/* AI Assistant Section */}
+                  <section className="bg-gradient-to-br from-blue-900/10 to-transparent border border-blue-500/10 rounded-2xl p-6 shadow-sm relative overflow-hidden mb-12">
+                    <div className="absolute top-0 right-0 p-4 opacity-5">
+                      <Sparkles className="w-16 h-16" />
                     </div>
-                    {error && <p className="text-xs text-red-400">{error}</p>}
-                  </div>
-                </section>
+                    <div className="flex items-center gap-2 mb-4">
+                      <Wand2 className="w-5 h-5 text-blue-400" />
+                      <h3 className="text-lg font-bold text-white uppercase tracking-tight">
+                        Gemini AI Assistant
+                      </h3>
+                    </div>
+
+                    <div className="space-y-4">
+                      <div className="flex gap-2">
+                        <input
+                          type="text"
+                          placeholder={
+                            settings.type === "form"
+                              ? "Describe your form..."
+                              : "Describe your theme..."
+                          }
+                          className="flex-1 bg-[#0D0D0D] border border-white/5 rounded-xl px-4 py-3 text-sm text-white focus:ring-1 focus:ring-blue-500 outline-none"
+                          value={aiPrompt}
+                          onChange={(e) => setAiPrompt(e.target.value)}
+                        />
+                        <button
+                          disabled={aiLoading || !aiPrompt}
+                          onClick={
+                            settings.type === "form"
+                              ? handleAiGenerateForm
+                              : handleAiSuggestStyles
+                          }
+                          className="bg-blue-600 hover:bg-blue-500 disabled:bg-white/5 disabled:text-slate-600 text-white font-bold px-6 py-3 rounded-xl transition-all"
+                        >
+                          {aiLoading ? (
+                            <Loader2 className="w-4 h-4 animate-spin" />
+                          ) : (
+                            "✨ Generate"
+                          )}
+                        </button>
+                      </div>
+                    </div>
+                  </section>
 
                 {settings.type === "form" && (
                   <>
@@ -982,13 +995,10 @@ export default function App() {
                 )}
 
                 {settings.type === "button" && (
-                  <section className="space-y-6">
-                    <h3 className="text-lg font-bold text-white mb-4">
-                      Button Properties
-                    </h3>
-                    <div className="grid grid-cols-2 gap-6">
+                  <section className="space-y-8">
+                    <div className="space-y-6">
                       <div className="space-y-2">
-                        <label className="text-xs font-bold text-slate-500 uppercase">
+                        <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">
                           Button Text
                         </label>
                         <input
@@ -997,26 +1007,76 @@ export default function App() {
                           onChange={(e) =>
                             setSettings({ ...settings, text: e.target.value })
                           }
-                          className="w-full bg-[#1c2128] border border-slate-800 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none"
+                          className="w-full bg-[#1A1A1A] border border-white/5 rounded-xl px-4 py-3.5 text-sm text-white focus:outline-none focus:ring-1 focus:ring-blue-600"
                         />
                       </div>
+                      
+                      <div className="grid grid-cols-2 gap-6">
+                        <div className="space-y-2">
+                          <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">
+                            Background Color
+                          </label>
+                          <div className="flex gap-2">
+                            <div 
+                              className="w-12 h-12 rounded-xl border border-white/10 shrink-0" 
+                              style={{ backgroundColor: settings.fillColor }}
+                            />
+                            <input
+                              type="text"
+                              value={settings.fillColor}
+                              onChange={(e) =>
+                                setSettings({
+                                  ...settings,
+                                  fillColor: e.target.value,
+                                })
+                              }
+                              className="flex-1 bg-[#1A1A1A] border border-white/5 rounded-xl px-4 py-3 text-sm text-white"
+                            />
+                          </div>
+                        </div>
+                        <div className="space-y-2">
+                          <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">
+                            Text Color
+                          </label>
+                          <div className="flex gap-2">
+                            <div 
+                              className="w-12 h-12 rounded-xl border border-white/10 shrink-0" 
+                              style={{ backgroundColor: settings.textColor }}
+                            />
+                            <input
+                              type="text"
+                              value={settings.textColor}
+                              onChange={(e) =>
+                                setSettings({
+                                  ...settings,
+                                  textColor: e.target.value,
+                                })
+                              }
+                              className="flex-1 bg-[#1A1A1A] border border-white/5 rounded-xl px-4 py-3 text-sm text-white"
+                            />
+                          </div>
+                        </div>
+                      </div>
+
                       <div className="space-y-2">
-                        <label className="text-xs font-bold text-slate-500 uppercase">
-                          Fill Color
+                        <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">
+                          Border Radius (px)
                         </label>
                         <input
-                          type="text"
-                          value={settings.fillColor}
+                          type="number"
+                          value={settings.radius}
                           onChange={(e) =>
-                            setSettings({
-                              ...settings,
-                              fillColor: e.target.value,
-                            })
+                            setSettings({ ...settings, radius: parseInt(e.target.value) || 0 })
                           }
-                          className="w-full bg-[#1c2128] border border-slate-800 rounded-lg px-4 py-2.5 text-sm text-white"
+                          className="w-full bg-[#1A1A1A] border border-white/5 rounded-xl px-4 py-3.5 text-sm text-white"
                         />
                       </div>
                     </div>
+
+                    <button className="w-full py-4 text-slate-500 text-sm font-medium border border-white/5 rounded-xl hover:bg-white/5 transition-colors flex items-center justify-center gap-2 mt-8">
+                      <Plus className="w-4 h-4 rotate-45" />
+                      Reset to Default <span className="text-slate-700 ml-1">(Pro only)</span>
+                    </button>
                   </section>
                 )}
 
@@ -1065,75 +1125,78 @@ export default function App() {
                 <div className="h-20"></div>
               </div>
             ) : (
-              <div className="h-full flex flex-col items-center justify-center bg-slate-50 rounded-2xl border-4 border-dashed border-slate-200 min-h-[500px] overflow-hidden p-10">
-                {settings.type === "form" && (
-                  <div className="w-full max-w-lg bg-white rounded-2xl shadow-2xl p-8 border border-slate-100">
-                    <div className="mb-8">
-                      <h2 className="text-2xl font-extrabold text-slate-900 leading-tight mb-2">
-                        {settings.title}
-                      </h2>
-                      <p className="text-slate-500 text-sm">
-                        {settings.subtitle}
-                      </p>
+              <div className="h-full min-h-[500px] flex flex-col items-center justify-center bg-white rounded-2xl overflow-hidden p-20 relative">
+                <div className="flex-1 flex items-center justify-center w-full">
+                  {settings.type === "form" && (
+                    <div className="w-full max-w-lg bg-white rounded-2xl shadow-2xl p-8 border border-slate-100">
+                      <div className="mb-8">
+                        <h2 className="text-2xl font-extrabold text-slate-900 leading-tight mb-2">
+                          {settings.title}
+                        </h2>
+                        <p className="text-slate-500 text-sm">
+                          {settings.subtitle}
+                        </p>
+                      </div>
+                      <div className="space-y-6 mb-10">
+                        {settings.fields.map((field) => (
+                          <div key={field.id} className="space-y-2">
+                            <label className="block text-sm font-semibold text-slate-700">
+                              {field.label}
+                            </label>
+                            <input
+                              disabled
+                              placeholder={field.placeholder}
+                              className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm"
+                            />
+                          </div>
+                        ))}
+                      </div>
+                      <div className="flex gap-4">
+                        <button className="flex-1 bg-blue-600 text-white font-bold py-3.5 rounded-xl">
+                          {settings.primaryButtonText}
+                        </button>
+                        <button className="flex-1 bg-slate-100 text-slate-700 font-bold py-3.5 rounded-xl">
+                          {settings.secondaryButtonText}
+                        </button>
+                      </div>
                     </div>
-                    <div className="space-y-6 mb-10">
-                      {settings.fields.map((field) => (
-                        <div key={field.id} className="space-y-2">
-                          <label className="block text-sm font-semibold text-slate-700">
-                            {field.label}
-                          </label>
-                          <input
-                            disabled
-                            placeholder={field.placeholder}
-                            className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm"
-                          />
-                        </div>
-                      ))}
-                    </div>
-                    <div className="flex gap-4">
-                      <button className="flex-1 bg-blue-600 text-white font-bold py-3.5 rounded-xl">
-                        {settings.primaryButtonText}
-                      </button>
-                      <button className="flex-1 bg-slate-100 text-slate-700 font-bold py-3.5 rounded-xl">
-                        {settings.secondaryButtonText}
-                      </button>
-                    </div>
-                  </div>
-                )}
-                {settings.type === "button" && (
-                  <button
-                    style={{
-                      backgroundColor: settings.fillColor,
-                      color: settings.textColor,
-                      borderRadius: `${settings.radius}px`,
-                      width: `${settings.width}px`,
-                    }}
-                    className="py-2.5 font-bold shadow-lg"
-                  >
-                    {settings.text}
-                  </button>
-                )}
-                {settings.type === "shell" && (
-                  <div className="w-full h-full max-h-[400px] bg-white shadow-xl flex flex-col rounded-lg overflow-hidden border border-slate-200">
-                    <header
-                      style={{ backgroundColor: settings.primaryColor }}
-                      className="h-16 flex items-center px-6 text-white font-bold"
+                  )}
+                  {settings.type === "button" && (
+                    <button
+                      style={{
+                        backgroundColor: settings.fillColor,
+                        color: settings.textColor,
+                        borderRadius: `${settings.radius}px`,
+                        width: `${settings.width || 160}px`,
+                      }}
+                      className="py-3 px-8 font-bold shadow-sm transition-all active:scale-95"
                     >
-                      {settings.appName}
-                    </header>
-                    <div className="flex-1 flex">
-                      <aside className="w-16 border-r border-slate-100 bg-slate-50 flex flex-col items-center py-4 gap-4">
-                        <div className="w-8 h-8 rounded bg-slate-200"></div>
-                        <div className="w-8 h-8 rounded bg-slate-200"></div>
-                      </aside>
-                      <main className="flex-1 p-6 bg-white">
-                        <div className="h-4 w-3/4 bg-slate-100 rounded mb-4"></div>
-                        <div className="h-40 w-full bg-slate-50 rounded border border-slate-100"></div>
-                      </main>
+                      {settings.text}
+                    </button>
+                  )}
+                  {settings.type === "shell" && (
+                    <div className="w-full h-full max-h-[400px] bg-white shadow-xl flex flex-col rounded-lg overflow-hidden border border-slate-200">
+                      <header
+                        style={{ backgroundColor: settings.primaryColor }}
+                        className="h-16 flex items-center px-6 text-white font-bold"
+                      >
+                        {settings.appName}
+                      </header>
+                      <div className="flex-1 flex">
+                        <aside className="w-16 border-r border-slate-100 bg-slate-50 flex flex-col items-center py-4 gap-4">
+                          <div className="w-8 h-8 rounded bg-slate-200"></div>
+                          <div className="w-8 h-8 rounded bg-slate-200"></div>
+                        </aside>
+                        <main className="flex-1 p-6 bg-white">
+                          <div className="h-4 w-3/4 bg-slate-100 rounded mb-4"></div>
+                          <div className="h-40 w-full bg-slate-50 rounded border border-slate-100"></div>
+                        </main>
+                      </div>
                     </div>
-                  </div>
-                )}
-                <div className="mt-8 px-6 py-3 bg-white border border-slate-200 shadow-sm rounded-full flex items-center gap-2 text-slate-500 text-xs font-bold uppercase tracking-wider">
+                  )}
+                </div>
+                
+                <div className="absolute bottom-8 left-1/2 -translate-x-1/2 px-6 py-3 bg-white border border-slate-100 shadow-sm rounded-full flex items-center gap-2 text-slate-400 text-[10px] font-bold uppercase tracking-wider">
                   <Sparkles className="w-3 h-3 text-blue-500" /> AI Powered
                   Preview
                 </div>
