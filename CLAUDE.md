@@ -2,16 +2,6 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
-## Active Migration Plan
-
-**MANDATORY**: Before starting any implementation step, you MUST:
-1. Read `~/.claude/plans/powerlibs-component-library.md`
-2. Identify which step is next (check the verification checklist and existing files)
-3. Update the plan file to mark the step in progress (add `[IN PROGRESS]` next to the step heading)
-4. After completing a step, mark it done in the verification checklist and add `[DONE]` to the step heading
-
-The plan lives at: `~/.claude/plans/powerlibs-component-library.md`
-
 ## Project Overview
 
 Power Apps Canvas YAML Generator — a single-file React application (`App.jsx`) that lets users visually configure UI components and export them as Power Apps Canvas YAML. Includes a Gemini AI assistant for form generation and color palette suggestions.

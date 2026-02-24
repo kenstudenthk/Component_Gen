@@ -22,6 +22,7 @@ import {
   Loader2,
   Sparkles,
   Palette,
+  Save,
 } from "lucide-react";
 
 const apiKey = ""; // Provided by environment
@@ -404,6 +405,44 @@ export default function App() {
   const [aiLoading, setAiLoading] = useState(false);
   const [aiPrompt, setAiPrompt] = useState("");
   const [error, setError] = useState("");
+  const [isSaving, setIsSaving] = useState(false);
+  const [saveSuccess, setSaveSuccess] = useState(false);
+
+  const handleSaveToD1 = async () => {
+    setIsSaving(true);
+    setSaveSuccess(false);
+    setError("");
+    try {
+      const yaml = generatePowerAppsYAML(activeComponent, settings);
+      
+      const payload = {
+        name: activeComponent,
+        category_slug: settings.type || "uncategorized",
+        description: `Generated ${activeComponent} configuration`,
+        yaml: yaml,
+        tags: [settings.type],
+        sort_order: 0
+      };
+
+      const response = await fetch('/api/components', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to save component to D1');
+      }
+
+      setSaveSuccess(true);
+      setTimeout(() => setSaveSuccess(false), 3000);
+    } catch (err) {
+      console.error(err);
+      setError("Failed to save component to Cloudflare D1.");
+    } finally {
+      setIsSaving(false);
+    }
+  };
 
   const handleComponentSelect = (label) => {
     if (TEMPLATES[label]) {
@@ -619,6 +658,20 @@ export default function App() {
             <div className="flex items-center gap-2">
               <button className="p-2 hover:bg-slate-700 rounded-lg text-slate-400">
                 <Sun className="w-4 h-4" />
+              </button>
+              <button
+                disabled={isSaving}
+                onClick={handleSaveToD1}
+                className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-500 disabled:bg-slate-700 text-white text-xs font-bold px-4 py-2 rounded-lg border border-indigo-500/20 transition-all active:scale-95"
+              >
+                {saveSuccess ? (
+                  <Check className="w-4 h-4 text-emerald-400" />
+                ) : isSaving ? (
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                ) : (
+                  <Save className="w-4 h-4" />
+                )}
+                {saveSuccess ? "Saved!" : isSaving ? "Saving..." : "Save to Library"}
               </button>
               <button
                 onClick={copyToClipboard}

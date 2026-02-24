@@ -1,8 +1,0 @@
-name = "powerapps-component-lib"
-compatibility_date = "2024-01-01"
-pages_build_output_dir = "dist"
-
-[[d1_databases]]
-binding = "DB"
-database_name = "component-library"
-database_id = "dd45c657-6a23-484a-b581-d28d166a3f2c"
