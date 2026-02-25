@@ -266,6 +266,33 @@ export const generatePowerAppsYAML = (activeComponentName, settings) => {
     );
   }
 
+  if (type === "inputField") {
+    return yamlControl(0, "CustomInput", "TextInput", {
+      Default: '=""',
+      HintText: `="${sanitizeYamlText(settings.placeholder)}"`,
+      Width: "=400",
+      Height: "=45",
+      BorderThickness: "=1",
+    });
+  }
+
+  if (type === "toggle") {
+    return yamlControl(0, "CustomToggle", "Toggle", {
+      Default: settings.isOn ? "=true" : "=false",
+      OnFill: `=${settings.activeColor || "RGBA(34, 197, 94, 1)"}`,
+    });
+  }
+
+  if (type === "dropdown" || type === "buttonGroup") {
+    const itemsList = (settings.items || []).map(i => `"${sanitizeYamlText(i)}"`).join(", ");
+    return yamlControl(0, "CustomPicker", "Gallery", {
+      Items: `=[${itemsList}]`,
+      Layout: "=Layout.Horizontal",
+      Width: "=400",
+      Height: "=50",
+    });
+  }
+
   return "# Component YAML logic coming soon";
 };
 
@@ -346,6 +373,27 @@ export const parsePowerAppsYAMLToSettings = (yaml, defaultType = "button", name 
 
   if (defaultType === "accordion") {
      settings.items = [{ id: "1", title: name, content: "Details" }];
+  }
+
+  if (defaultType === "inputField") {
+    const hintMatch = yaml.match(/HintText:\s*="([^"]+)"/);
+    settings.placeholder = hintMatch ? hintMatch[1] : "Enter value...";
+    settings.label = name;
+  }
+
+  if (defaultType === "toggle") {
+    settings.isOn = yaml.includes("Default: =true");
+    const colorMatch = yaml.match(/OnFill:\s*([^\n]+)/);
+    if (colorMatch) settings.activeColor = colorMatch[1].trim().replace(/^['"]|['"]$/g, "").replace(/^=/, "");
+    settings.label = name;
+  }
+
+  if (defaultType === "dropdown" || defaultType === "buttonGroup") {
+    const itemsMatch = yaml.match(/Items:\s*=\[([^\]]+)\]/);
+    if (itemsMatch) {
+      settings.items = itemsMatch[1].split(",").map(i => i.trim().replace(/^"|"$/g, ""));
+    }
+    settings.label = name;
   }
 
   return settings;

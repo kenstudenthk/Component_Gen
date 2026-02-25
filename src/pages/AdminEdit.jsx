@@ -5,7 +5,12 @@ import Navbar from "../components/Navbar";
 import YamlViewer from "../components/YamlViewer";
 import { getComponent, updateComponent } from "../lib/api";
 
-const CATEGORY_SLUGS = ["buttons", "forms", "badges", "accordions", "shells"];
+const CATEGORY_SLUGS = [
+  "accordions", "animations", "app-shells", "badges", "button-group",
+  "buttons", "calendars", "cards", "drawers", "dropdowns", "gallery",
+  "forms", "input-fields", "modals", "navigation", "sidebars", 
+  "speed-dial", "tabs", "toast", "toggles"
+];
 
 export default function AdminEdit() {
   const { id } = useParams();

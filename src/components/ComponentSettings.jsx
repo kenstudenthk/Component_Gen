@@ -302,6 +302,117 @@ export default function ComponentSettings({ settings, setSettings }) {
         </div>
       )}
 
+      {settings.type === "inputField" && (
+        <div className="space-y-4">
+          <div className="space-y-2">
+            <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Label</label>
+            <input
+              type="text"
+              value={settings.label || ""}
+              onChange={(e) => setSettings({ ...settings, label: e.target.value })}
+              className="w-full bg-[#1A1A1A] border border-white/5 rounded-lg px-3 py-2 text-xs text-white"
+            />
+          </div>
+          <div className="space-y-2">
+            <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Placeholder</label>
+            <input
+              type="text"
+              value={settings.placeholder || ""}
+              onChange={(e) => setSettings({ ...settings, placeholder: e.target.value })}
+              className="w-full bg-[#1A1A1A] border border-white/5 rounded-lg px-3 py-2 text-xs text-white"
+            />
+          </div>
+          <div className="space-y-2">
+            <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Helper Text</label>
+            <input
+              type="text"
+              value={settings.helperText || ""}
+              onChange={(e) => setSettings({ ...settings, helperText: e.target.value })}
+              className="w-full bg-[#1A1A1A] border border-white/5 rounded-lg px-3 py-2 text-xs text-white"
+            />
+          </div>
+        </div>
+      )}
+
+      {settings.type === "toggle" && (
+        <div className="space-y-4">
+          <div className="space-y-2">
+            <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Label</label>
+            <input
+              type="text"
+              value={settings.label || ""}
+              onChange={(e) => setSettings({ ...settings, label: e.target.value })}
+              className="w-full bg-[#1A1A1A] border border-white/5 rounded-lg px-3 py-2 text-xs text-white"
+            />
+          </div>
+          <div className="flex items-center justify-between p-3 bg-[#1A1A1A] border border-white/5 rounded-lg">
+            <span className="text-xs font-bold text-slate-300">Default On</span>
+            <input 
+              type="checkbox" 
+              checked={settings.isOn} 
+              onChange={(e) => setSettings({ ...settings, isOn: e.target.checked })}
+              className="w-4 h-4"
+            />
+          </div>
+          <div className="space-y-2">
+            <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Active Color</label>
+            <input
+              type="text"
+              value={settings.activeColor || ""}
+              onChange={(e) => setSettings({ ...settings, activeColor: e.target.value })}
+              className="w-full bg-[#1A1A1A] border border-white/5 rounded-lg px-3 py-2 text-xs text-white"
+            />
+          </div>
+        </div>
+      )}
+
+      {(settings.type === "dropdown" || settings.type === "buttonGroup") && (
+        <div className="space-y-6">
+          {settings.type === "dropdown" && (
+            <div className="space-y-2">
+              <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Label</label>
+              <input
+                type="text"
+                value={settings.label || ""}
+                onChange={(e) => setSettings({ ...settings, label: e.target.value })}
+                className="w-full bg-[#1A1A1A] border border-white/5 rounded-lg px-3 py-2 text-xs text-white"
+              />
+            </div>
+          )}
+          <div className="space-y-3">
+            <div className="flex justify-between items-center">
+              <h4 className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Items</h4>
+              <button 
+                onClick={() => setSettings({ ...settings, items: [...(settings.items || []), "New Item"] })} 
+                className="text-blue-400 hover:text-blue-300"
+              >
+                <Plus size={14} />
+              </button>
+            </div>
+            {(settings.items || []).map((item, idx) => (
+              <div key={idx} className="flex gap-2">
+                <input
+                  type="text"
+                  value={item}
+                  onChange={(e) => {
+                    const newItems = [...settings.items];
+                    newItems[idx] = e.target.value;
+                    setSettings({ ...settings, items: newItems });
+                  }}
+                  className="flex-1 bg-[#1A1A1A] border border-white/5 rounded-lg px-3 py-1.5 text-xs text-white"
+                />
+                <button 
+                  onClick={() => setSettings({ ...settings, items: settings.items.filter((_, i) => i !== idx) })}
+                  className="text-slate-600 hover:text-red-400"
+                >
+                  <Trash2 size={14} />
+                </button>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
       {settings.type === "shell" && (
         <div className="space-y-4">
           <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">App Name</label>

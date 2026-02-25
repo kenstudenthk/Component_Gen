@@ -13,12 +13,26 @@ export default function ComponentCard({ component }) {
   useEffect(() => {
     // Map category slugs to component types expected by Preview/Settings
     const typeMap = {
-      "buttons": "button",
-      "forms": "form",
-      "badges": "badge",
       "accordions": "accordion",
-      "shells": "shell",
-      "drawers": "drawer"
+      "animations": "animation",
+      "app-shells": "shell",
+      "badges": "badge",
+      "button-group": "buttonGroup",
+      "buttons": "button",
+      "calendars": "calendar",
+      "cards": "card",
+      "drawers": "drawer",
+      "dropdowns": "dropdown",
+      "forms": "form",
+      "gallery": "gallery",
+      "input-fields": "inputField",
+      "modals": "modal",
+      "navigation": "navigation",
+      "sidebars": "sidebar",
+      "speed-dial": "speedDial",
+      "tabs": "tab",
+      "toast": "toast",
+      "toggles": "toggle"
     };
     
     const mappedType = typeMap[component.category_slug] || component.category_slug || "button";

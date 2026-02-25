@@ -72,6 +72,61 @@ export default function ComponentPreview({ settings }) {
             {settings.text}
           </span>
         )}
+
+        {settings.type === "inputField" && (
+          <div className="w-full max-w-xs space-y-1.5">
+            <label className="block text-[10px] font-bold text-slate-700 uppercase tracking-wider">
+              {settings.label}
+            </label>
+            <input
+              disabled
+              placeholder={settings.placeholder}
+              className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-xs shadow-sm"
+            />
+            {settings.helperText && (
+              <p className="text-[9px] text-slate-400 italic">{settings.helperText}</p>
+            )}
+          </div>
+        )}
+
+        {settings.type === "toggle" && (
+          <div className="flex items-center gap-3">
+            <span className="text-xs font-semibold text-slate-700">{settings.label}</span>
+            <div 
+              style={{ backgroundColor: settings.isOn ? (settings.activeColor || "#22c55e") : "#e2e8f0" }}
+              className="w-10 h-5 rounded-full relative transition-colors cursor-not-allowed"
+            >
+              <div className={`absolute top-0.5 w-4 h-4 bg-white rounded-full shadow-sm transition-all ${settings.isOn ? "left-5.5" : "left-0.5"}`} />
+            </div>
+          </div>
+        )}
+
+        {settings.type === "dropdown" && (
+          <div className="w-full max-w-xs space-y-1.5">
+            <label className="block text-[10px] font-bold text-slate-700 uppercase tracking-wider">
+              {settings.label}
+            </label>
+            <div className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-xs shadow-sm flex justify-between items-center text-slate-500">
+              {settings.items?.[0] || "Select..."}
+              <ChevronDown size={14} />
+            </div>
+          </div>
+        )}
+
+        {settings.type === "buttonGroup" && (
+          <div className="flex border border-slate-200 rounded-lg overflow-hidden shadow-sm">
+            {(settings.items || ["Item 1", "Item 2"]).map((item, idx) => (
+              <div 
+                key={idx}
+                className={`px-4 py-2 text-xs font-bold border-r border-slate-200 last:border-0 ${
+                  settings.activeItem === item ? "bg-blue-600 text-white" : "bg-white text-slate-600"
+                }`}
+              >
+                {item}
+              </div>
+            ))}
+          </div>
+        )}
         
         {settings.type === "accordion" && (
           <div className="w-full max-w-xs bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm scale-90">

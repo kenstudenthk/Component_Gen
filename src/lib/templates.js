@@ -6,9 +6,21 @@ import {
   ExternalLink,
   Zap,
   Code,
+  MousePointer2,
+  Calendar,
+  Type,
+  Square,
+  PanelLeft,
+  Bell,
+  Monitor,
+  CheckSquare,
+  ChevronDown,
+  Play,
+  Copy,
 } from "lucide-react";
 
 export const INITIAL_TEMPLATES = {
+  // --- EXISTING ---
   "Dynamic Form Card": {
     type: "form",
     title: "Deploy to production",
@@ -19,40 +31,6 @@ export const INITIAL_TEMPLATES = {
     ],
     primaryButtonText: "Deploy",
     secondaryButtonText: "Cancel",
-  },
-  Buttons: {
-    type: "button",
-    text: "Click Me",
-    fillColor: "RGBA(59, 130, 246, 1)",
-    textColor: "RGBA(255, 255, 255, 1)",
-    radius: 8,
-    width: 160,
-  },
-  Badge: {
-    type: "badge",
-    text: "Status: Active",
-    theme: "success",
-  },
-  Accordions: {
-    type: "accordion",
-    items: [
-      {
-        id: "1",
-        title: "Section 1",
-        content: "Details for section one go here.",
-      },
-      {
-        id: "2",
-        title: "Section 2",
-        content: "Details for section two go here.",
-      },
-    ],
-  },
-  "App Shells": {
-    type: "shell",
-    appName: "Admin Portal",
-    showSidebar: true,
-    primaryColor: "RGBA(15, 23, 42, 1)",
   },
   "Classic Button": {
     type: "button",
@@ -104,9 +82,151 @@ export const INITIAL_TEMPLATES = {
     dropShadow: true,
     radius: 4,
   },
+  "App Shells": {
+    type: "shell",
+    appName: "Admin Portal",
+    showSidebar: true,
+    primaryColor: "RGBA(15, 23, 42, 1)",
+  },
+  "Drawer Default": {
+    type: "drawer",
+    title: "Main Menu",
+    primaryColor: "RGBA(30, 41, 59, 1)",
+  },
+  "Badge Success": {
+    type: "badge",
+    text: "Status: Active",
+    theme: "success",
+  },
+  "Basic Accordion": {
+    type: "accordion",
+    items: [
+      { id: "1", title: "Section 1", content: "Details for section one." },
+      { id: "2", title: "Section 2", content: "Details for section two." },
+    ],
+  },
+
+  // --- NEW CATEGORIES ---
+  "Basic Input": {
+    type: "inputField",
+    label: "Username",
+    placeholder: "john_doe",
+    helperText: "Enter your unique handle",
+  },
+  "Toggle Switch": {
+    type: "toggle",
+    label: "Enable Notifications",
+    isOn: true,
+    activeColor: "RGBA(34, 197, 94, 1)",
+  },
+  "Simple Dropdown": {
+    type: "dropdown",
+    label: "Select Region",
+    items: ["North America", "Europe", "Asia"],
+  },
+  "Primary Button Group": {
+    type: "buttonGroup",
+    items: ["Day", "Week", "Month"],
+    activeItem: "Day",
+  },
+  "Content Card": {
+    type: "card",
+    title: "Project Alpha",
+    subtitle: "Web Development",
+    body: "Comprehensive suite of web components for Power Apps.",
+  },
+  "Main Navigation": {
+    type: "navigation",
+    primaryColor: "RGBA(59, 130, 246, 1)",
+    items: ["Dashboard", "Users", "Settings"],
+  },
+  "App Sidebar": {
+    type: "sidebar",
+    width: 240,
+    items: ["Home", "Analytics", "Logs"],
+  },
+  "Tab Strip": {
+    type: "tab",
+    items: ["Overview", "Details", "History"],
+    activeTab: "Overview",
+  },
+  "Center Modal": {
+    type: "modal",
+    title: "Confirm Action",
+    body: "Are you sure you want to delete this item?",
+  },
+  "Success Toast": {
+    type: "toast",
+    message: "Changes saved successfully",
+    theme: "success",
+  },
+  "Action Speed Dial": {
+    type: "speedDial",
+    icon: "Plus",
+    items: ["Document", "Email", "Event"],
+  },
+  "Image Gallery": {
+    type: "gallery",
+    title: "Team Members",
+    layout: "grid",
+  },
+  "Event Calendar": {
+    type: "calendar",
+    startDay: "Monday",
+  },
+  "Loading Animation": {
+    type: "animation",
+    style: "spinner",
+    speed: "normal",
+  },
 };
 
 export const INITIAL_SIDEBAR_ITEMS = [
+  {
+    group: "Actions & Buttons",
+    items: [
+      { label: "Buttons", icon: MousePointer2 },
+      { label: "Button Group", icon: Copy },
+      { label: "Speed Dial", icon: Zap },
+    ],
+  },
+  {
+    group: "Forms & Inputs",
+    items: [
+      { label: "Input Fields", icon: Type },
+      { label: "Toggles", icon: CheckSquare },
+      { label: "Dropdowns", icon: ChevronDown },
+      { label: "Dynamic Form Card", icon: Layout },
+    ],
+  },
+  {
+    group: "Navigation & Layout",
+    items: [
+      { label: "App Shells", icon: AppWindow },
+      { label: "Navigation", icon: Monitor },
+      { label: "Sidebars", icon: PanelLeft },
+      { label: "Tabs", icon: Layers },
+      { label: "Drawers", icon: Box },
+    ],
+  },
+  {
+    group: "Content & Data",
+    items: [
+      { label: "Cards", icon: Square },
+      { label: "Accordions", icon: Box },
+      { label: "Badge", icon: Box },
+      { label: "Gallery", icon: Layout },
+      { label: "Calendars", icon: Calendar },
+    ],
+  },
+  {
+    group: "Feedback & Motion",
+    items: [
+      { label: "Toast", icon: Bell },
+      { label: "Modals", icon: AppWindow },
+      { label: "Animations", icon: Play },
+    ],
+  },
   {
     group: "Other Resources",
     items: [
@@ -127,22 +247,6 @@ export const INITIAL_SIDEBAR_ITEMS = [
     items: [
       { label: "Custom YAML", icon: Layers },
       { label: "Custom SVG", icon: Layers },
-    ],
-  },
-  {
-    group: "Components",
-    items: [
-      { label: "Accordions", icon: Box },
-      { label: "Badge", icon: Box },
-      { label: "Buttons", icon: Box },
-      { label: "Classic Button", icon: Box },
-      { label: "Classic Icon Button", icon: Box },
-      { label: "Outline Button", icon: Box },
-      { label: "Loading Button", icon: Box },
-      { label: "Gradient Button", icon: Box },
-      { label: "Button Raised", icon: Box },
-      { label: "Dynamic Form Card", icon: Layout },
-      { label: "App Shells", icon: AppWindow },
     ],
   },
 ];
