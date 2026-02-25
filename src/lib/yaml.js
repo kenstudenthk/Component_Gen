@@ -315,6 +315,35 @@ export const generatePowerAppsYAML = (activeComponentName, settings) => {
     }, children, "ManualLayout");
   }
 
+  if (type === "modal") {
+    return yamlControl(0, "CustomModal", "GroupContainer", {
+      Fill: "=RGBA(255, 255, 255, 1)",
+      Width: "=500",
+      Height: "=300",
+      RadiusTopLeft: "=16",
+      DropShadow: "=DropShadow.Bold",
+    });
+  }
+
+  if (type === "toast") {
+    const color = settings.theme === "error" ? "RGBA(239, 68, 68, 1)" : (settings.theme === "success" ? "RGBA(34, 197, 94, 1)" : "RGBA(59, 130, 246, 1)");
+    return yamlControl(0, "CustomToast", "GroupContainer", {
+      Fill: `=${color}`,
+      Width: "=350",
+      Height: "=60",
+      RadiusTopLeft: "=8",
+    });
+  }
+
+  if (type === "speedDial") {
+    const itemsList = (settings.items || []).map(i => `"${sanitizeYamlText(i)}"`).join(", ");
+    return yamlControl(0, "CustomSpeedDial", "Gallery", {
+      Items: `=[${itemsList}]`,
+      Width: "=60",
+      Height: "=300",
+    });
+  }
+
   return "# Component YAML logic coming soon";
 };
 
@@ -410,7 +439,7 @@ export const parsePowerAppsYAMLToSettings = (yaml, defaultType = "button", name 
     settings.label = name;
   }
 
-  if (defaultType === "dropdown" || defaultType === "buttonGroup" || defaultType === "navigation" || defaultType === "sidebar" || defaultType === "tab") {
+  if (defaultType === "dropdown" || defaultType === "buttonGroup" || defaultType === "navigation" || defaultType === "sidebar" || defaultType === "tab" || defaultType === "speedDial") {
     const itemsMatch = yaml.match(/Items:\s*=\[([^\]]+)\]/);
     if (itemsMatch) {
       settings.items = itemsMatch[1].split(",").map(i => i.trim().replace(/^"|"$/g, ""));
@@ -420,6 +449,16 @@ export const parsePowerAppsYAMLToSettings = (yaml, defaultType = "button", name 
       if (widthMatch) settings.width = parseInt(widthMatch[1], 10);
     }
     settings.label = name;
+  }
+
+  if (defaultType === "modal") {
+    settings.title = name;
+    settings.body = "Confirm your action.";
+  }
+
+  if (defaultType === "toast") {
+    settings.message = name;
+    settings.theme = "success";
   }
 
   if (defaultType === "card") {

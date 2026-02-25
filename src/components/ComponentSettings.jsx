@@ -398,9 +398,58 @@ export default function ComponentSettings({ settings, setSettings }) {
         </div>
       )}
 
-      {(settings.type === "dropdown" || settings.type === "buttonGroup" || settings.type === "navigation" || settings.type === "sidebar" || settings.type === "tab") && (
+      {settings.type === "modal" && (
+        <div className="space-y-4">
+          <div className="space-y-2">
+            <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Modal Title</label>
+            <input
+              type="text"
+              value={settings.title || ""}
+              onChange={(e) => setSettings({ ...settings, title: e.target.value })}
+              className="w-full bg-[#1A1A1A] border border-white/5 rounded-lg px-3 py-2 text-xs text-white"
+            />
+          </div>
+          <div className="space-y-2">
+            <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Body Content</label>
+            <textarea
+              rows={3}
+              value={settings.body || ""}
+              onChange={(e) => setSettings({ ...settings, body: e.target.value })}
+              className="w-full bg-[#1A1A1A] border border-white/5 rounded-lg px-3 py-2 text-xs text-white resize-none"
+            />
+          </div>
+        </div>
+      )}
+
+      {settings.type === "toast" && (
+        <div className="space-y-4">
+          <div className="space-y-2">
+            <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Message</label>
+            <input
+              type="text"
+              value={settings.message || ""}
+              onChange={(e) => setSettings({ ...settings, message: e.target.value })}
+              className="w-full bg-[#1A1A1A] border border-white/5 rounded-lg px-3 py-2 text-xs text-white"
+            />
+          </div>
+          <div className="space-y-2">
+            <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Theme</label>
+            <select
+              value={settings.theme || "success"}
+              onChange={(e) => setSettings({ ...settings, theme: e.target.value })}
+              className="w-full bg-[#1A1A1A] border border-white/5 rounded-lg px-3 py-2 text-xs text-white"
+            >
+              <option value="success">Success (Green)</option>
+              <option value="error">Error (Red)</option>
+              <option value="info">Info (Blue)</option>
+            </select>
+          </div>
+        </div>
+      )}
+
+      {(settings.type === "dropdown" || settings.type === "buttonGroup" || settings.type === "navigation" || settings.type === "sidebar" || settings.type === "tab" || settings.type === "speedDial") && (
         <div className="space-y-6">
-          {(settings.type === "dropdown" || settings.type === "navigation" || settings.type === "sidebar") && (
+          {(settings.type === "dropdown" || settings.type === "navigation" || settings.type === "sidebar" || settings.type === "speedDial") && (
             <div className="space-y-2">
               <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">
                 {settings.type === "sidebar" ? "Width (px)" : (settings.type === "navigation" ? "Primary Color" : "Label")}

@@ -191,6 +191,56 @@ export default function ComponentPreview({ settings }) {
             </div>
           </div>
         )}
+
+        {settings.type === "modal" && (
+          <div className="w-full h-full min-h-[300px] flex items-center justify-center relative bg-slate-900/10 rounded-xl overflow-hidden">
+            <div className="w-full max-w-[280px] bg-white rounded-2xl shadow-2xl p-6 border border-slate-100 relative z-10 scale-90">
+              <h3 className="text-lg font-bold text-slate-900 mb-2">{settings.title}</h3>
+              <p className="text-slate-500 text-xs mb-6">{settings.body}</p>
+              <div className="flex gap-3">
+                <button className="flex-1 bg-blue-600 text-white text-[10px] font-bold py-2 rounded-lg">Confirm</button>
+                <button className="flex-1 bg-slate-100 text-slate-700 text-[10px] font-bold py-2 rounded-lg">Cancel</button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {settings.type === "toast" && (
+          <div className="w-full h-full flex flex-col items-center justify-start p-8">
+            <div className={`w-full max-w-[300px] rounded-xl shadow-lg border p-4 flex items-center gap-3 transition-all ${
+              settings.theme === "success" ? "bg-emerald-50 border-emerald-100 text-emerald-800" :
+              settings.theme === "error" ? "bg-red-50 border-red-100 text-red-800" :
+              "bg-blue-50 border-blue-100 text-blue-800"
+            }`}>
+              <div className={`w-2 h-2 rounded-full animate-pulse ${
+                settings.theme === "success" ? "bg-emerald-500" :
+                settings.theme === "error" ? "bg-red-500" :
+                "bg-blue-500"
+              }`} />
+              <span className="text-xs font-bold">{settings.message}</span>
+            </div>
+          </div>
+        )}
+
+        {settings.type === "speedDial" && (
+          <div className="w-full h-full flex items-end justify-end p-10 relative">
+            <div className="flex flex-col items-end gap-3 mb-16 mr-2">
+              {(settings.items || []).map((item, idx) => (
+                <div key={idx} className="flex items-center gap-2">
+                  <span className="bg-white border border-slate-200 text-[9px] font-bold px-2 py-1 rounded shadow-sm text-slate-600 whitespace-nowrap">
+                    {item}
+                  </span>
+                  <div className="w-8 h-8 bg-white border border-slate-200 rounded-full flex items-center justify-center shadow-sm text-blue-600">
+                    <Box size={14} />
+                  </div>
+                </div>
+              ))}
+            </div>
+            <button className="w-14 h-14 bg-blue-600 rounded-full shadow-2xl flex items-center justify-center text-white transition-transform hover:rotate-45 active:scale-90 absolute bottom-10 right-10">
+              <Plus size={24} />
+            </button>
+          </div>
+        )}
         
         {settings.type === "accordion" && (
           <div className="w-full max-w-xs bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm scale-90">
