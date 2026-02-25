@@ -3,7 +3,11 @@ import { Copy, Check, Eye, Settings as SettingsIcon } from "lucide-react";
 import ComponentPreview from "./ComponentPreview";
 import ComponentSettings from "./ComponentSettings";
 import { INITIAL_TEMPLATES } from "../lib/templates";
-import { generatePowerAppsYAML, parsePowerAppsYAMLToSettings } from "../lib/yaml";
+import {
+  generatePowerAppsYAML,
+  parsePowerAppsYAMLToSettings,
+} from "../lib/yaml";
+import { SLUG_TO_TYPE } from "../lib/categoryMappings";
 
 export default function ComponentCard({ component }) {
   const [activeTab, setActiveTab] = useState("Preview");
@@ -11,60 +15,76 @@ export default function ComponentCard({ component }) {
   const [settings, setSettings] = useState(null);
 
   useEffect(() => {
-    // Map category slugs to component types expected by Preview/Settings
-    const typeMap = {
-      "accordions": "accordion",
-      "animations": "animation",
-      "app-shells": "shell",
-      "badges": "badge",
-      "button-group": "buttonGroup",
-      "buttons": "button",
-      "calendars": "calendar",
-      "cards": "card",
-      "drawers": "drawer",
-      "dropdowns": "dropdown",
-      "forms": "form",
-      "gallery": "gallery",
-      "input-fields": "inputField",
-      "modals": "modal",
-      "navigation": "navigation",
-      "sidebars": "sidebar",
-      "speed-dial": "speedDial",
-      "tabs": "tab",
-      "toast": "toast",
-      "toggles": "toggle"
-    };
-    
-    const mappedType = typeMap[component.category_slug] || component.category_slug || "button";
+    const mappedType =
+      SLUG_TO_TYPE[component.category_slug] ||
+      component.category_slug ||
+      "button";
 
     // Try to find default settings in INITIAL_TEMPLATES by name
-    let defaultSettings = INITIAL_TEMPLATES[component.name] || 
-                          INITIAL_TEMPLATES[component.name.replace(/Classic Button/i, "Classic Button")];
-                          
+    let defaultSettings =
+      INITIAL_TEMPLATES[component.name] ||
+      INITIAL_TEMPLATES[
+        component.name.replace(/Classic Button/i, "Classic Button")
+      ];
+
     if (!defaultSettings) {
       // Parse settings from the component's YAML if it exists
       if (component.yaml) {
-        defaultSettings = parsePowerAppsYAMLToSettings(component.yaml, mappedType, component.name);
+        defaultSettings = parsePowerAppsYAMLToSettings(
+          component.yaml,
+          mappedType,
+          component.name,
+        );
       } else {
         // Fallback with robust default properties based on type
         if (mappedType === "button") {
-          defaultSettings = { type: "button", text: component.name, fillColor: "=RGBA(59, 130, 246, 1)", textColor: "=RGBA(255, 255, 255, 1)", radius: 4, width: 160 };
+          defaultSettings = {
+            type: "button",
+            text: component.name,
+            fillColor: "=RGBA(59, 130, 246, 1)",
+            textColor: "=RGBA(255, 255, 255, 1)",
+            radius: 4,
+            width: 160,
+          };
         } else if (mappedType === "badge") {
-          defaultSettings = { type: "badge", text: component.name, theme: "success" };
+          defaultSettings = {
+            type: "badge",
+            text: component.name,
+            theme: "success",
+          };
         } else if (mappedType === "form") {
-          defaultSettings = { type: "form", title: component.name, subtitle: "Description", fields: [], primaryButtonText: "Submit", secondaryButtonText: "Cancel" };
+          defaultSettings = {
+            type: "form",
+            title: component.name,
+            subtitle: "Description",
+            fields: [],
+            primaryButtonText: "Submit",
+            secondaryButtonText: "Cancel",
+          };
         } else if (mappedType === "accordion") {
-           defaultSettings = { type: "accordion", items: [{ id: "1", title: "Item 1", content: "Details" }] };
+          defaultSettings = {
+            type: "accordion",
+            items: [{ id: "1", title: "Item 1", content: "Details" }],
+          };
         } else if (mappedType === "shell") {
-           defaultSettings = { type: "shell", appName: component.name, showSidebar: true, primaryColor: "=RGBA(15, 23, 42, 1)" };
+          defaultSettings = {
+            type: "shell",
+            appName: component.name,
+            showSidebar: true,
+            primaryColor: "=RGBA(15, 23, 42, 1)",
+          };
         } else if (mappedType === "drawer") {
-           defaultSettings = { type: "drawer", title: component.name, primaryColor: "=RGBA(255, 255, 255, 1)" };
+          defaultSettings = {
+            type: "drawer",
+            title: component.name,
+            primaryColor: "=RGBA(255, 255, 255, 1)",
+          };
         } else {
-           defaultSettings = { type: mappedType, text: component.name };
+          defaultSettings = { type: mappedType, text: component.name };
         }
       }
     }
-    
+
     setSettings({
       ...defaultSettings,
       name: component.name,
@@ -73,7 +93,9 @@ export default function ComponentCard({ component }) {
   }, [component]);
 
   const handleCopy = async () => {
-    const yaml = settings ? generatePowerAppsYAML(settings.name, settings) : component.yaml;
+    const yaml = settings
+      ? generatePowerAppsYAML(settings.name, settings)
+      : component.yaml;
     try {
       await navigator.clipboard.writeText(yaml);
       setCopied(true);
@@ -91,7 +113,10 @@ export default function ComponentCard({ component }) {
   };
 
   const tags = component.tags
-    ? component.tags.split(",").map((t) => t.trim()).filter(Boolean)
+    ? component.tags
+        .split(",")
+        .map((t) => t.trim())
+        .filter(Boolean)
     : [];
 
   if (!settings) return null;
@@ -101,7 +126,10 @@ export default function ComponentCard({ component }) {
       {/* Card Header */}
       <div className="p-5 border-b border-white/5 bg-[#1A1A1A]/50 flex items-center justify-between gap-4">
         <div className="min-w-0">
-          <h3 className="font-bold text-white text-sm truncate" title={component.name}>
+          <h3
+            className="font-bold text-white text-sm truncate"
+            title={component.name}
+          >
             {component.name}
           </h3>
           <p className="text-[10px] text-slate-500 truncate">

@@ -5,7 +5,6 @@ import {
   Bell,
   Calendar,
   ChevronDown,
-  CheckSquare,
   Copy,
   Image,
   Layout,
@@ -24,26 +23,26 @@ import {
 } from "lucide-react";
 
 const ICONS = {
-  "accordions":   ChevronDown,
-  "animations":   Play,
-  "app-shells":   Monitor,
-  "badges":       Tag,
+  accordions: ChevronDown,
+  animations: Play,
+  "app-shells": Monitor,
+  badges: Tag,
   "button-group": Copy,
-  "buttons":      MousePointer2,
-  "calendars":    Calendar,
-  "cards":        Square,
-  "drawers":      PanelLeft,
-  "dropdowns":    Sliders,
-  "forms":        Layout,
-  "gallery":      Image,
+  buttons: MousePointer2,
+  calendars: Calendar,
+  cards: Square,
+  drawers: PanelLeft,
+  dropdowns: Sliders,
+  forms: Layout,
+  gallery: Image,
   "input-fields": Type,
-  "modals":       Layers,
-  "navigation":   Menu,
-  "sidebars":     AppWindow,
-  "speed-dial":   Zap,
-  "tabs":         AlignJustify,
-  "toast":        Bell,
-  "toggles":      ToggleLeft,
+  modals: Layers,
+  navigation: Menu,
+  sidebars: AppWindow,
+  "speed-dial": Zap,
+  tabs: AlignJustify,
+  toast: Bell,
+  toggles: ToggleLeft,
 };
 
 export default function CategoryGrid({ categories }) {
@@ -64,7 +63,7 @@ export default function CategoryGrid({ categories }) {
                 </div>
                 <h2 className="font-semibold text-white">{cat.name}</h2>
               </div>
-              {cat.component_count > 0 && (
+              {Number(cat.component_count) > 0 && (
                 <span className="text-xs font-semibold text-slate-500 bg-slate-800 group-hover:bg-slate-700 px-2 py-0.5 rounded-full transition-colors">
                   {cat.component_count}
                 </span>

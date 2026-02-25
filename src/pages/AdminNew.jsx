@@ -4,49 +4,22 @@ import { ChevronLeft, Code, ChevronDown } from "lucide-react";
 import Navbar from "../components/Navbar";
 import ComponentPreview from "../components/ComponentPreview";
 import ComponentSettings from "../components/ComponentSettings";
-import { INITIAL_TEMPLATES } from "../lib/templates";
 import { generatePowerAppsYAML } from "../lib/yaml";
 import { createComponent } from "../lib/api";
-
-const CATEGORY_SLUGS = [
-  "accordions", "animations", "app-shells", "badges", "button-group",
-  "buttons", "calendars", "cards", "drawers", "dropdowns",
-  "forms", "gallery", "input-fields", "modals", "navigation",
-  "sidebars", "speed-dial", "tabs", "toast", "toggles",
-];
-
-const SLUG_TO_TYPE = {
-  "accordions": "accordion", "animations": "animation", "app-shells": "shell",
-  "badges": "badge", "button-group": "buttonGroup", "buttons": "button",
-  "calendars": "calendar", "cards": "card", "drawers": "drawer",
-  "dropdowns": "dropdown", "forms": "form", "gallery": "gallery",
-  "input-fields": "inputField", "modals": "modal", "navigation": "navigation",
-  "sidebars": "sidebar", "speed-dial": "speedDial", "tabs": "tab",
-  "toast": "toast", "toggles": "toggle",
-};
-
-const TYPE_DEFAULTS = {
-  accordion: "Basic Accordion", animation: "Loading Animation", shell: "App Shells",
-  badge: "Badge Success", buttonGroup: "Primary Button Group", button: "Classic Button",
-  calendar: "Event Calendar", card: "Content Card", drawer: "Drawer Default",
-  dropdown: "Simple Dropdown", form: "Dynamic Form Card", gallery: "Image Gallery",
-  inputField: "Basic Input", modal: "Center Modal", navigation: "Main Navigation",
-  sidebar: "App Sidebar", speedDial: "Action Speed Dial", tab: "Tab Strip",
-  toast: "Success Toast", toggle: "Toggle Switch",
-};
-
-function defaultSettings(slug) {
-  const type = SLUG_TO_TYPE[slug] || "button";
-  return INITIAL_TEMPLATES[TYPE_DEFAULTS[type]] || { type, text: "Component" };
-}
-
-function slugLabel(slug) {
-  return slug.split("-").map((w) => w.charAt(0).toUpperCase() + w.slice(1)).join(" ");
-}
+import {
+  CATEGORY_SLUGS,
+  defaultSettings,
+  slugLabel,
+} from "../lib/categoryMappings";
 
 export default function AdminNew() {
   const navigate = useNavigate();
-  const [form, setForm] = useState({ name: "", category_slug: "buttons", description: "", tags: "" });
+  const [form, setForm] = useState({
+    name: "",
+    category_slug: "buttons",
+    description: "",
+    tags: "",
+  });
   const [settings, setSettings] = useState(defaultSettings("buttons"));
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState(null);
@@ -83,7 +56,10 @@ export default function AdminNew() {
     }
   };
 
-  const generatedYaml = generatePowerAppsYAML(form.name || "Component", settings);
+  const generatedYaml = generatePowerAppsYAML(
+    form.name || "Component",
+    settings,
+  );
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -125,7 +101,9 @@ export default function AdminNew() {
                 className="rounded-lg border border-slate-700 bg-slate-900 px-3 py-2 text-sm text-white focus:outline-none focus:border-blue-500 transition-colors"
               >
                 {CATEGORY_SLUGS.map((s) => (
-                  <option key={s} value={s}>{slugLabel(s)}</option>
+                  <option key={s} value={s}>
+                    {slugLabel(s)}
+                  </option>
                 ))}
               </select>
             </label>
@@ -165,7 +143,10 @@ export default function AdminNew() {
                   Settings
                 </p>
               </div>
-              <ComponentSettings settings={settings} setSettings={setSettings} />
+              <ComponentSettings
+                settings={settings}
+                setSettings={setSettings}
+              />
             </div>
 
             <div className="rounded-xl border border-slate-800 bg-slate-950">

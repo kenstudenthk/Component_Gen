@@ -4,14 +4,7 @@ import { ChevronLeft, Search } from "lucide-react";
 import Navbar from "../components/Navbar";
 import ComponentCard from "../components/ComponentCard";
 import { getComponents } from "../lib/api";
-
-function slugToTitle(slug) {
-  if (!slug) return "Components";
-  return slug
-    .split("-")
-    .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
-    .join(" ");
-}
+import { slugLabel } from "../lib/categoryMappings";
 
 export default function Category() {
   const { slug } = useParams();
@@ -35,10 +28,10 @@ export default function Category() {
       !search ||
       c.name.toLowerCase().includes(search.toLowerCase()) ||
       c.description?.toLowerCase().includes(search.toLowerCase()) ||
-      c.tags?.toLowerCase().includes(search.toLowerCase())
+      c.tags?.toLowerCase().includes(search.toLowerCase()),
   );
 
-  const title = slugToTitle(slug);
+  const title = slug ? slugLabel(slug) : "Components";
 
   return (
     <div className="min-h-screen flex flex-col">

@@ -21,7 +21,7 @@ export default function Library() {
     (c) =>
       !search ||
       c.name.toLowerCase().includes(search.toLowerCase()) ||
-      c.description?.toLowerCase().includes(search.toLowerCase())
+      c.description?.toLowerCase().includes(search.toLowerCase()),
   );
 
   return (
@@ -39,19 +39,21 @@ export default function Library() {
                 : "Select a category to browse components."}
             </p>
           </div>
-          <div className="relative w-full sm:w-72">
-            <Search
-              size={14}
-              className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500"
-            />
-            <input
-              type="text"
-              placeholder="Search categories…"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              className="w-full bg-slate-900 border border-slate-700 rounded-lg pl-8 pr-3 py-2 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-blue-500 transition-colors"
-            />
-          </div>
+          {!loading && !error && categories.length > 0 && (
+            <div className="relative w-full sm:w-72">
+              <Search
+                size={14}
+                className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500"
+              />
+              <input
+                type="text"
+                placeholder="Search categories…"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                className="w-full bg-slate-900 border border-slate-700 rounded-lg pl-8 pr-3 py-2 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-blue-500 transition-colors"
+              />
+            </div>
+          )}
         </div>
 
         {loading && (
