@@ -257,23 +257,23 @@ export const parsePowerAppsYAMLToSettings = (yaml, defaultType = "button", name 
     const textMatch = yaml.match(/Text:\s*="([^"]+)"/);
     settings.text = textMatch ? textMatch[1] : name;
 
-    const fillMatch = yaml.match(/Fill:\s*=?([^\n]+)/);
-    if (fillMatch) settings.fillColor = fillMatch[1].trim().replace(/^['"]|['"]$/g, "");
+    const fillMatch = yaml.match(/Fill:\s*([^\n]+)/);
+    if (fillMatch) settings.fillColor = fillMatch[1].trim().replace(/^['"]|['"]$/g, "").replace(/^=/, "");
 
-    const colorMatch = yaml.match(/Color:\s*=?([^\n]+)/);
-    if (colorMatch) settings.textColor = colorMatch[1].trim().replace(/^['"]|['"]$/g, "");
+    const colorMatch = yaml.match(/Color:\s*([^\n]+)/);
+    if (colorMatch) settings.textColor = colorMatch[1].trim().replace(/^['"]|['"]$/g, "").replace(/^=/, "");
 
-    const radiusMatch = yaml.match(/RadiusTopLeft:\s*=?([0-9]+)/);
-    if (radiusMatch) settings.radius = parseInt(radiusMatch[1], 10);
+    const radiusMatch = yaml.match(/RadiusTopLeft:\s*([^\n]+)/);
+    if (radiusMatch) settings.radius = parseInt(radiusMatch[1].trim().replace(/^['"]|['"]$/g, "").replace(/^=/, ""), 10);
 
-    const widthMatch = yaml.match(/Width:\s*=?([0-9]+)/);
-    if (widthMatch) settings.width = parseInt(widthMatch[1], 10);
+    const widthMatch = yaml.match(/Width:\s*([^\n]+)/);
+    if (widthMatch) settings.width = parseInt(widthMatch[1].trim().replace(/^['"]|['"]$/g, "").replace(/^=/, ""), 10);
 
-    const borderMatch = yaml.match(/BorderColor:\s*=([^\n]+)/);
-    if (borderMatch) settings.borderColor = borderMatch[1].trim();
+    const borderMatch = yaml.match(/BorderColor:\s*([^\n]+)/);
+    if (borderMatch) settings.borderColor = borderMatch[1].trim().replace(/^['"]|['"]$/g, "").replace(/^=/, "");
 
-    const borderThickMatch = yaml.match(/BorderThickness:\s*=?([0-9]+)/);
-    if (borderThickMatch) settings.borderThickness = parseInt(borderThickMatch[1], 10);
+    const borderThickMatch = yaml.match(/BorderThickness:\s*([^\n]+)/);
+    if (borderThickMatch) settings.borderThickness = parseInt(borderThickMatch[1].trim().replace(/^['"]|['"]$/g, "").replace(/^=/, ""), 10);
 
     if (yaml.includes("DropShadow")) {
       settings.dropShadow = true;
@@ -298,8 +298,8 @@ export const parsePowerAppsYAMLToSettings = (yaml, defaultType = "button", name 
     const textMatch = yaml.match(/Text:\s*="([^"]+)"/);
     settings.appName = textMatch ? textMatch[1] : name;
 
-    const fillMatch = yaml.match(/Fill:\s*=([^\n]+)/);
-    if (fillMatch) settings.primaryColor = fillMatch[1].trim();
+    const fillMatch = yaml.match(/Fill:\s*([^\n]+)/);
+    if (fillMatch) settings.primaryColor = fillMatch[1].trim().replace(/^['"]|['"]$/g, "").replace(/^=/, "");
     settings.showSidebar = true;
   }
   
