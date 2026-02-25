@@ -366,15 +366,53 @@ export default function ComponentSettings({ settings, setSettings }) {
         </div>
       )}
 
-      {(settings.type === "dropdown" || settings.type === "buttonGroup") && (
+      {settings.type === "card" && (
+        <div className="space-y-4">
+          <div className="space-y-2">
+            <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Title</label>
+            <input
+              type="text"
+              value={settings.title || ""}
+              onChange={(e) => setSettings({ ...settings, title: e.target.value })}
+              className="w-full bg-[#1A1A1A] border border-white/5 rounded-lg px-3 py-2 text-xs text-white"
+            />
+          </div>
+          <div className="space-y-2">
+            <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Subtitle</label>
+            <input
+              type="text"
+              value={settings.subtitle || ""}
+              onChange={(e) => setSettings({ ...settings, subtitle: e.target.value })}
+              className="w-full bg-[#1A1A1A] border border-white/5 rounded-lg px-3 py-2 text-xs text-white"
+            />
+          </div>
+          <div className="space-y-2">
+            <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Body Text</label>
+            <textarea
+              rows={3}
+              value={settings.body || ""}
+              onChange={(e) => setSettings({ ...settings, body: e.target.value })}
+              className="w-full bg-[#1A1A1A] border border-white/5 rounded-lg px-3 py-2 text-xs text-white resize-none"
+            />
+          </div>
+        </div>
+      )}
+
+      {(settings.type === "dropdown" || settings.type === "buttonGroup" || settings.type === "navigation" || settings.type === "sidebar" || settings.type === "tab") && (
         <div className="space-y-6">
-          {settings.type === "dropdown" && (
+          {(settings.type === "dropdown" || settings.type === "navigation" || settings.type === "sidebar") && (
             <div className="space-y-2">
-              <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Label</label>
+              <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">
+                {settings.type === "sidebar" ? "Width (px)" : (settings.type === "navigation" ? "Primary Color" : "Label")}
+              </label>
               <input
-                type="text"
-                value={settings.label || ""}
-                onChange={(e) => setSettings({ ...settings, label: e.target.value })}
+                type={settings.type === "sidebar" ? "number" : "text"}
+                value={settings.type === "sidebar" ? (settings.width || 180) : (settings.type === "navigation" ? (settings.primaryColor || "") : (settings.label || ""))}
+                onChange={(e) => {
+                   const val = settings.type === "sidebar" ? parseInt(e.target.value) : e.target.value;
+                   const key = settings.type === "sidebar" ? "width" : (settings.type === "navigation" ? "primaryColor" : "label");
+                   setSettings({ ...settings, [key]: val });
+                }}
                 className="w-full bg-[#1A1A1A] border border-white/5 rounded-lg px-3 py-2 text-xs text-white"
               />
             </div>

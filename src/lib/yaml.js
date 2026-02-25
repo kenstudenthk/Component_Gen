@@ -283,14 +283,36 @@ export const generatePowerAppsYAML = (activeComponentName, settings) => {
     });
   }
 
-  if (type === "dropdown" || type === "buttonGroup") {
+  if (type === "dropdown" || type === "buttonGroup" || type === "navigation" || type === "sidebar" || type === "tab") {
     const itemsList = (settings.items || []).map(i => `"${sanitizeYamlText(i)}"`).join(", ");
-    return yamlControl(0, "CustomPicker", "Gallery", {
+    const isVertical = type === "sidebar";
+    return yamlControl(0, `Custom${type.charAt(0).toUpperCase() + type.slice(1)}`, "Gallery", {
       Items: `=[${itemsList}]`,
-      Layout: "=Layout.Horizontal",
-      Width: "=400",
-      Height: "=50",
+      Layout: isVertical ? "=Layout.Vertical" : "=Layout.Horizontal",
+      Width: isVertical ? `=${settings.width || 240}` : "=1366",
+      Height: isVertical ? "=768" : "=60",
     });
+  }
+
+  if (type === "card") {
+    let children = "";
+    children += yamlControl(6, "TitleLabel", "Label", {
+      Text: `="${sanitizeYamlText(settings.title)}"`,
+      FontWeight: "=FontWeight.Bold",
+      X: "=20", Y: "=20",
+    });
+    children += yamlControl(6, "SubtitleLabel", "Label", {
+      Text: `="${sanitizeYamlText(settings.subtitle)}"`,
+      Color: "=RGBA(59, 130, 246, 1)",
+      X: "=20", Y: "=50",
+    });
+    return yamlControl(0, "CustomCard", "GroupContainer", {
+      Fill: "=RGBA(255, 255, 255, 1)",
+      RadiusTopLeft: "=12",
+      Width: "=400",
+      Height: "=200",
+      DropShadow: "=DropShadow.Regular",
+    }, children, "ManualLayout");
   }
 
   return "# Component YAML logic coming soon";
@@ -388,12 +410,23 @@ export const parsePowerAppsYAMLToSettings = (yaml, defaultType = "button", name 
     settings.label = name;
   }
 
-  if (defaultType === "dropdown" || defaultType === "buttonGroup") {
+  if (defaultType === "dropdown" || defaultType === "buttonGroup" || defaultType === "navigation" || defaultType === "sidebar" || defaultType === "tab") {
     const itemsMatch = yaml.match(/Items:\s*=\[([^\]]+)\]/);
     if (itemsMatch) {
       settings.items = itemsMatch[1].split(",").map(i => i.trim().replace(/^"|"$/g, ""));
     }
+    if (defaultType === "sidebar") {
+      const widthMatch = yaml.match(/Width:\s*=?([0-9]+)/);
+      if (widthMatch) settings.width = parseInt(widthMatch[1], 10);
+    }
     settings.label = name;
+  }
+
+  if (defaultType === "card") {
+    const titleMatch = yaml.match(/Text:\s*="([^"]+)"/);
+    settings.title = titleMatch ? titleMatch[1] : name;
+    settings.subtitle = "Subtitle";
+    settings.body = "Body content text.";
   }
 
   return settings;

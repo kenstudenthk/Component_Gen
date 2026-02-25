@@ -127,6 +127,70 @@ export default function ComponentPreview({ settings }) {
             ))}
           </div>
         )}
+
+        {settings.type === "card" && (
+          <div className="w-full max-w-sm bg-white rounded-2xl shadow-xl overflow-hidden border border-slate-100 p-6">
+            <h3 className="text-xl font-bold text-slate-900 mb-1">{settings.title}</h3>
+            <p className="text-blue-500 text-xs font-bold mb-4 uppercase tracking-wider">{settings.subtitle}</p>
+            <p className="text-slate-500 text-sm leading-relaxed">{settings.body}</p>
+            <div className="mt-6 flex justify-end">
+              <button className="text-blue-600 font-bold text-xs uppercase tracking-widest">Read More</button>
+            </div>
+          </div>
+        )}
+
+        {settings.type === "navigation" && (
+          <div className="w-full h-16 rounded-xl overflow-hidden shadow-lg flex items-center px-6 gap-8 border border-slate-100" style={{ backgroundColor: settings.primaryColor || "#3b82f6" }}>
+            <div className="w-8 h-8 bg-white/20 rounded-lg" />
+            <nav className="flex gap-6">
+              {(settings.items || ["Home", "Docs"]).map((item, idx) => (
+                <span key={idx} className="text-white text-xs font-bold opacity-80 hover:opacity-100 cursor-pointer">{item}</span>
+              ))}
+            </nav>
+          </div>
+        )}
+
+        {settings.type === "sidebar" && (
+          <div className="w-full h-full max-h-[300px] flex rounded-xl overflow-hidden border border-slate-100 shadow-lg">
+            <aside className="h-full bg-slate-900 flex flex-col p-4 gap-4" style={{ width: `${settings.width || 180}px` }}>
+              <div className="w-full h-8 bg-white/10 rounded mb-2" />
+              {(settings.items || ["Menu 1", "Menu 2"]).map((item, idx) => (
+                <div key={idx} className="flex items-center gap-3 text-white/60 text-xs font-medium px-2 py-1">
+                  <div className="w-3 h-3 bg-white/20 rounded-full" />
+                  {item}
+                </div>
+              ))}
+            </aside>
+            <main className="flex-1 bg-slate-50 p-6">
+              <div className="h-4 w-1/2 bg-slate-200 rounded mb-4" />
+              <div className="h-24 w-full bg-slate-200 rounded opacity-50" />
+            </main>
+          </div>
+        )}
+
+        {settings.type === "tab" && (
+          <div className="w-full max-w-md bg-white rounded-xl shadow-lg border border-slate-100 overflow-hidden">
+            <div className="flex border-b border-slate-100">
+              {(settings.items || ["Tab 1", "Tab 2"]).map((item, idx) => (
+                <div 
+                  key={idx}
+                  className={`px-6 py-4 text-xs font-bold relative transition-colors ${
+                    settings.activeTab === item ? "text-blue-600" : "text-slate-400"
+                  }`}
+                >
+                  {item}
+                  {settings.activeTab === item && (
+                    <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-blue-600 mx-4" />
+                  )}
+                </div>
+              ))}
+            </div>
+            <div className="p-8">
+              <div className="h-4 w-3/4 bg-slate-100 rounded mb-3" />
+              <div className="h-4 w-1/2 bg-slate-50 rounded" />
+            </div>
+          </div>
+        )}
         
         {settings.type === "accordion" && (
           <div className="w-full max-w-xs bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm scale-90">
