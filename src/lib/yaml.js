@@ -344,6 +344,29 @@ export const generatePowerAppsYAML = (activeComponentName, settings) => {
     });
   }
 
+  if (type === "gallery") {
+    return yamlControl(0, "CustomGallery", "Gallery", {
+      Items: "=Filter(DataSource, true)",
+      TemplateSize: "=120",
+    });
+  }
+
+  if (type === "calendar") {
+    return yamlControl(0, "CustomCalendar", "GroupContainer", {
+      Width: "=640",
+      Height: "=480",
+    });
+  }
+
+  if (type === "animation") {
+    const duration = settings.speed === "fast" ? 300 : (settings.speed === "slow" ? 2000 : 1000);
+    return yamlControl(0, "CustomAnimation", "Timer", {
+      Duration: `=${duration}`,
+      Repeat: "=true",
+      AutoStart: "=true",
+    });
+  }
+
   return "# Component YAML logic coming soon";
 };
 
@@ -459,6 +482,19 @@ export const parsePowerAppsYAMLToSettings = (yaml, defaultType = "button", name 
   if (defaultType === "toast") {
     settings.message = name;
     settings.theme = "success";
+  }
+
+  if (defaultType === "gallery") {
+    settings.title = name;
+    settings.layout = "grid";
+  }
+
+  if (defaultType === "calendar") {
+    settings.startDay = "Monday";
+  }
+
+  if (defaultType === "animation") {
+    settings.speed = yaml.includes("Duration: =300") ? "fast" : (yaml.includes("Duration: =2000") ? "slow" : "normal");
   }
 
   if (defaultType === "card") {

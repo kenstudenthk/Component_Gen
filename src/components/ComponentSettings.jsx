@@ -447,6 +447,64 @@ export default function ComponentSettings({ settings, setSettings }) {
         </div>
       )}
 
+      {settings.type === "gallery" && (
+        <div className="space-y-4">
+          <div className="space-y-2">
+            <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Gallery Title</label>
+            <input
+              type="text"
+              value={settings.title || ""}
+              onChange={(e) => setSettings({ ...settings, title: e.target.value })}
+              className="w-full bg-[#1A1A1A] border border-white/5 rounded-lg px-3 py-2 text-xs text-white"
+            />
+          </div>
+          <div className="space-y-2">
+            <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Layout</label>
+            <select
+              value={settings.layout || "grid"}
+              onChange={(e) => setSettings({ ...settings, layout: e.target.value })}
+              className="w-full bg-[#1A1A1A] border border-white/5 rounded-lg px-3 py-2 text-xs text-white"
+            >
+              <option value="grid">Grid (2 columns)</option>
+              <option value="list">List (1 column)</option>
+            </select>
+          </div>
+        </div>
+      )}
+
+      {settings.type === "calendar" && (
+        <div className="space-y-4">
+          <div className="space-y-2">
+            <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Week Starts On</label>
+            <select
+              value={settings.startDay || "Monday"}
+              onChange={(e) => setSettings({ ...settings, startDay: e.target.value })}
+              className="w-full bg-[#1A1A1A] border border-white/5 rounded-lg px-3 py-2 text-xs text-white"
+            >
+              <option value="Monday">Monday</option>
+              <option value="Sunday">Sunday</option>
+            </select>
+          </div>
+        </div>
+      )}
+
+      {settings.type === "animation" && (
+        <div className="space-y-4">
+          <div className="space-y-2">
+            <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Speed</label>
+            <select
+              value={settings.speed || "normal"}
+              onChange={(e) => setSettings({ ...settings, speed: e.target.value })}
+              className="w-full bg-[#1A1A1A] border border-white/5 rounded-lg px-3 py-2 text-xs text-white"
+            >
+              <option value="slow">Slow</option>
+              <option value="normal">Normal</option>
+              <option value="fast">Fast</option>
+            </select>
+          </div>
+        </div>
+      )}
+
       {(settings.type === "dropdown" || settings.type === "buttonGroup" || settings.type === "navigation" || settings.type === "sidebar" || settings.type === "tab" || settings.type === "speedDial") && (
         <div className="space-y-6">
           {(settings.type === "dropdown" || settings.type === "navigation" || settings.type === "sidebar" || settings.type === "speedDial") && (

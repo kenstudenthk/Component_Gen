@@ -241,6 +241,58 @@ export default function ComponentPreview({ settings }) {
             </button>
           </div>
         )}
+
+        {settings.type === "gallery" && (
+          <div className="w-full h-full p-6 bg-slate-50 flex flex-col gap-4 overflow-hidden rounded-xl">
+            <h4 className="text-xs font-bold text-slate-900">{settings.title}</h4>
+            <div className={`grid gap-3 ${settings.layout === "list" ? "grid-cols-1" : "grid-cols-2"}`}>
+              {[1, 2, 3, 4].map((i) => (
+                <div key={i} className="bg-white border border-slate-200 rounded-lg p-3 flex gap-3 shadow-sm">
+                  <div className="w-10 h-10 bg-slate-100 rounded-lg shrink-0 flex items-center justify-center text-slate-300">
+                    <Layers size={20} />
+                  </div>
+                  <div className="flex-1 space-y-1.5">
+                    <div className="h-2 w-3/4 bg-slate-200 rounded" />
+                    <div className="h-1.5 w-1/2 bg-slate-100 rounded" />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {settings.type === "calendar" && (
+          <div className="w-full h-full p-6 bg-white rounded-xl shadow-lg border border-slate-100 flex flex-col gap-4">
+            <div className="flex justify-between items-center px-2">
+              <span className="text-[10px] font-bold text-slate-900">February 2026</span>
+              <div className="flex gap-2 text-slate-400"><ChevronRight size={12} className="rotate-180" /><ChevronRight size={12} /></div>
+            </div>
+            <div className="grid grid-cols-7 gap-1 text-center">
+              {["S", "M", "T", "W", "T", "F", "S"].map((d) => (
+                <span key={d} className="text-[8px] font-bold text-slate-400">{d}</span>
+              ))}
+              {Array.from({ length: 28 }).map((_, i) => (
+                <div key={i} className={`h-6 flex items-center justify-center text-[9px] font-medium rounded-md ${i === 14 ? "bg-blue-600 text-white shadow-md" : "text-slate-600 hover:bg-slate-50"}`}>
+                  {i + 1}
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {settings.type === "animation" && (
+          <div className="w-full h-full flex items-center justify-center p-10 bg-slate-900/5 rounded-xl border border-dashed border-slate-200">
+            <div className="flex flex-col items-center gap-6">
+              <div className={`w-16 h-16 border-4 border-blue-600 border-t-transparent rounded-full animate-spin ${settings.speed === "fast" ? "duration-300" : (settings.speed === "slow" ? "duration-1000" : "duration-700")}`} />
+              <div className="flex gap-3">
+                <div className="w-3 h-3 bg-blue-600 rounded-full animate-bounce" style={{ animationDelay: "0s" }} />
+                <div className="w-3 h-3 bg-blue-600 rounded-full animate-bounce" style={{ animationDelay: "0.1s" }} />
+                <div className="w-3 h-3 bg-blue-600 rounded-full animate-bounce" style={{ animationDelay: "0.2s" }} />
+              </div>
+              <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Loading Components...</span>
+            </div>
+          </div>
+        )}
         
         {settings.type === "accordion" && (
           <div className="w-full max-w-xs bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm scale-90">
