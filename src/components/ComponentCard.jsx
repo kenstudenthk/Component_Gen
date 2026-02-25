@@ -3,7 +3,7 @@ import { Copy, Check, Eye, Settings as SettingsIcon } from "lucide-react";
 import ComponentPreview from "./ComponentPreview";
 import ComponentSettings from "./ComponentSettings";
 import { INITIAL_TEMPLATES } from "../lib/templates";
-import { generatePowerAppsYAML } from "../lib/yaml";
+import { generatePowerAppsYAML, parsePowerAppsYAMLToSettings } from "../lib/yaml";
 
 export default function ComponentCard({ component }) {
   const [activeTab, setActiveTab] = useState("Preview");
@@ -27,19 +27,24 @@ export default function ComponentCard({ component }) {
                           INITIAL_TEMPLATES[component.name.replace(/Classic Button/i, "Classic Button")];
                           
     if (!defaultSettings) {
-      // Fallback with robust default properties based on type
-      if (mappedType === "button") {
-        defaultSettings = { type: "button", text: component.name, fillColor: "RGBA(59, 130, 246, 1)", textColor: "RGBA(255, 255, 255, 1)", radius: 4, width: 160 };
-      } else if (mappedType === "badge") {
-        defaultSettings = { type: "badge", text: component.name, theme: "success" };
-      } else if (mappedType === "form") {
-        defaultSettings = { type: "form", title: component.name, subtitle: "Description", fields: [], primaryButtonText: "Submit", secondaryButtonText: "Cancel" };
-      } else if (mappedType === "accordion") {
-         defaultSettings = { type: "accordion", items: [{ id: "1", title: "Item 1", content: "Details" }] };
-      } else if (mappedType === "shell") {
-         defaultSettings = { type: "shell", appName: component.name, showSidebar: true, primaryColor: "RGBA(15, 23, 42, 1)" };
+      // Parse settings from the component's YAML if it exists
+      if (component.yaml) {
+        defaultSettings = parsePowerAppsYAMLToSettings(component.yaml, mappedType, component.name);
       } else {
-         defaultSettings = { type: mappedType, text: component.name };
+        // Fallback with robust default properties based on type
+        if (mappedType === "button") {
+          defaultSettings = { type: "button", text: component.name, fillColor: "=RGBA(59, 130, 246, 1)", textColor: "=RGBA(255, 255, 255, 1)", radius: 4, width: 160 };
+        } else if (mappedType === "badge") {
+          defaultSettings = { type: "badge", text: component.name, theme: "success" };
+        } else if (mappedType === "form") {
+          defaultSettings = { type: "form", title: component.name, subtitle: "Description", fields: [], primaryButtonText: "Submit", secondaryButtonText: "Cancel" };
+        } else if (mappedType === "accordion") {
+           defaultSettings = { type: "accordion", items: [{ id: "1", title: "Item 1", content: "Details" }] };
+        } else if (mappedType === "shell") {
+           defaultSettings = { type: "shell", appName: component.name, showSidebar: true, primaryColor: "=RGBA(15, 23, 42, 1)" };
+        } else {
+           defaultSettings = { type: mappedType, text: component.name };
+        }
       }
     }
     

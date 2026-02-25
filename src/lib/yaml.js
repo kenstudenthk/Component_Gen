@@ -245,3 +245,76 @@ export const generatePowerAppsYAML = (activeComponentName, settings) => {
 
   return "# Component YAML logic coming soon";
 };
+
+// Extremely basic regex parser to extract properties from PowerApps YAML
+// so that the Preview and Settings panels can display components loaded from the database.
+export const parsePowerAppsYAMLToSettings = (yaml, defaultType = "button", name = "Component") => {
+  const settings = { type: defaultType, name };
+
+  if (!yaml || typeof yaml !== "string") return settings;
+
+  if (defaultType === "button") {
+    const textMatch = yaml.match(/Text:\s*="([^"]+)"/);
+    settings.text = textMatch ? textMatch[1] : name;
+
+    const fillMatch = yaml.match(/Fill:\s*=?([^\n]+)/);
+    if (fillMatch) settings.fillColor = fillMatch[1].trim().replace(/^['"]|['"]$/g, "");
+
+    const colorMatch = yaml.match(/Color:\s*=?([^\n]+)/);
+    if (colorMatch) settings.textColor = colorMatch[1].trim().replace(/^['"]|['"]$/g, "");
+
+    const radiusMatch = yaml.match(/RadiusTopLeft:\s*=?([0-9]+)/);
+    if (radiusMatch) settings.radius = parseInt(radiusMatch[1], 10);
+
+    const widthMatch = yaml.match(/Width:\s*=?([0-9]+)/);
+    if (widthMatch) settings.width = parseInt(widthMatch[1], 10);
+
+    const borderMatch = yaml.match(/BorderColor:\s*=([^\n]+)/);
+    if (borderMatch) settings.borderColor = borderMatch[1].trim();
+
+    const borderThickMatch = yaml.match(/BorderThickness:\s*=?([0-9]+)/);
+    if (borderThickMatch) settings.borderThickness = parseInt(borderThickMatch[1], 10);
+
+    if (yaml.includes("DropShadow")) {
+      settings.dropShadow = true;
+    }
+  }
+
+  if (defaultType === "badge") {
+    const textMatch = yaml.match(/Text:\s*="([^"]+)"/);
+    settings.text = textMatch ? textMatch[1] : name;
+
+    const fillMatch = yaml.match(/Fill:\s*=([^\n]+)/);
+    if (fillMatch && fillMatch[1].includes("197, 94")) {
+      settings.theme = "success";
+    } else if (fillMatch && fillMatch[1].includes("59, 130, 246")) {
+      settings.theme = "info";
+    } else {
+      settings.theme = "success";
+    }
+  }
+
+  if (defaultType === "shell") {
+    const textMatch = yaml.match(/Text:\s*="([^"]+)"/);
+    settings.appName = textMatch ? textMatch[1] : name;
+
+    const fillMatch = yaml.match(/Fill:\s*=([^\n]+)/);
+    if (fillMatch) settings.primaryColor = fillMatch[1].trim();
+    settings.showSidebar = true;
+  }
+  
+  if (defaultType === "form") {
+    const titleMatch = yaml.match(/Text:\s*="([^"]+)"/); // First text usually title
+    settings.title = titleMatch ? titleMatch[1] : name;
+    settings.subtitle = "Description";
+    settings.primaryButtonText = "Submit";
+    settings.secondaryButtonText = "Cancel";
+    settings.fields = []; // Hard to parse fields from YAML simply
+  }
+
+  if (defaultType === "accordion") {
+     settings.items = [{ id: "1", title: name, content: "Details" }];
+  }
+
+  return settings;
+};
