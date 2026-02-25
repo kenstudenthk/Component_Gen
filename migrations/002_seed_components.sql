@@ -243,7 +243,7 @@ INSERT INTO components (id, name, category_slug, description, yaml, tags, sort_o
 VALUES (
   'comp-shell-default',
   'App Shell Header',
-  'shells',
+  'app-shells',
   'A full-width app header shell with title and brand colour',
   '- AppShell:
     Control: GroupContainer
