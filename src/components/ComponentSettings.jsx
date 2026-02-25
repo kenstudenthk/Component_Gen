@@ -320,6 +320,25 @@ export default function ComponentSettings({ settings, setSettings }) {
           />
         </div>
       )}
+
+      {settings.type === "drawer" && (
+        <div className="space-y-4">
+          <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Drawer Title</label>
+          <input
+            type="text"
+            value={settings.title || ""}
+            onChange={(e) => setSettings({ ...settings, title: e.target.value })}
+            className="w-full bg-[#1A1A1A] border border-white/5 rounded-lg px-3 py-2 text-xs text-white"
+          />
+          <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Background Color</label>
+          <input
+            type="text"
+            value={settings.primaryColor || ""}
+            onChange={(e) => setSettings({ ...settings, primaryColor: e.target.value })}
+            className="w-full bg-[#1A1A1A] border border-white/5 rounded-lg px-3 py-2 text-xs text-white"
+          />
+        </div>
+      )}
       
       <div className="h-4"></div>
     </div>

@@ -17,7 +17,8 @@ export default function ComponentCard({ component }) {
       "forms": "form",
       "badges": "badge",
       "accordions": "accordion",
-      "shells": "shell"
+      "shells": "shell",
+      "drawers": "drawer"
     };
     
     const mappedType = typeMap[component.category_slug] || component.category_slug || "button";
@@ -42,6 +43,8 @@ export default function ComponentCard({ component }) {
            defaultSettings = { type: "accordion", items: [{ id: "1", title: "Item 1", content: "Details" }] };
         } else if (mappedType === "shell") {
            defaultSettings = { type: "shell", appName: component.name, showSidebar: true, primaryColor: "=RGBA(15, 23, 42, 1)" };
+        } else if (mappedType === "drawer") {
+           defaultSettings = { type: "drawer", title: component.name, primaryColor: "=RGBA(255, 255, 255, 1)" };
         } else {
            defaultSettings = { type: mappedType, text: component.name };
         }

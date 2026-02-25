@@ -243,6 +243,29 @@ export const generatePowerAppsYAML = (activeComponentName, settings) => {
     );
   }
 
+  if (type === "drawer") {
+    const children = yamlControl(6, "DrawerTitle", "Label", {
+      Text: `="${sanitizeYamlText(settings.title || "Menu")}"`,
+      Color: "=RGBA(255, 255, 255, 1)",
+      X: "=20",
+      Y: "=20",
+      Size: "=18",
+      FontWeight: "=FontWeight.Bold",
+    });
+    return yamlControl(
+      0,
+      "DrawerContainer",
+      "GroupContainer",
+      {
+        Fill: `=${settings.primaryColor || "RGBA(30, 41, 59, 1)"}`,
+        Width: "=300",
+        Height: "=768",
+      },
+      children,
+      "ManualLayout",
+    );
+  }
+
   return "# Component YAML logic coming soon";
 };
 
@@ -301,6 +324,15 @@ export const parsePowerAppsYAMLToSettings = (yaml, defaultType = "button", name 
     const fillMatch = yaml.match(/Fill:\s*([^\n]+)/);
     if (fillMatch) settings.primaryColor = fillMatch[1].trim().replace(/^['"]|['"]$/g, "").replace(/^=/, "");
     settings.showSidebar = true;
+  }
+
+  if (defaultType === "drawer") {
+    const textMatch = yaml.match(/Text:\s*="([^"]+)"/);
+    settings.title = textMatch ? textMatch[1] : name;
+
+    const fillMatch = yaml.match(/Fill:\s*([^\n]+)/);
+    if (fillMatch) settings.primaryColor = fillMatch[1].trim().replace(/^['"]|['"]$/g, "").replace(/^=/, "");
+    settings.items = [{ id: "1", title: "Home" }, { id: "2", title: "Profile" }];
   }
   
   if (defaultType === "form") {
