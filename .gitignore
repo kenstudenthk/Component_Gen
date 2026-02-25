@@ -33,3 +33,6 @@ dist-ssr
 *.stackdump
 everything-claude-code/
 \n.env
+
+# Git worktrees
+.worktrees/
