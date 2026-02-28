@@ -12,8 +12,13 @@ PowerLibs Component Library — A React web application for creating, previewing
 # Install dependencies
 npm install
 
-# Start dev server (Vite)
+# Start dev server (Vite + Wrangler with API proxy)
 npm run dev
+
+# Start individual servers (if needed)
+npm run vite:dev      # Vite only (port 5173)
+npm run wrangler:dev  # Wrangler only (port 8788)
+npm run pages:dev     # Wrangler with dist (legacy)
 
 # Build for production
 npm run build
@@ -30,6 +35,8 @@ npx wrangler pages deploy dist
 # Run D1 migrations
 npx wrangler d1 migrations apply component-library --remote
 ```
+
+**Note:** `npm run dev` starts both Vite and Wrangler concurrently. Vite proxies `/api/*` requests to Wrangler, enabling fast HMR while maintaining full backend functionality. Both servers must be running for the application to work correctly.
 
 ## Architecture
 
@@ -132,11 +139,34 @@ Gemini AI integration (currently unused - legacy from original single-file versi
 **Vite config:**
 - `vite.config.js` - Uses `@vitejs/plugin-react` and `@tailwindcss/vite`
 
+**Development server:**
+- Unified dev command uses `concurrently` to run Vite and Wrangler simultaneously
+- Vite (port 5173) - Frontend with HMR
+- Wrangler (port 8788) - Backend API with D1 database simulation
+- API proxy: `/api/*` requests automatically forwarded from Vite to Wrangler
+- Configuration: `vite.config.js` - Proxy settings in `server.proxy`
+
 ## Active Development
 
 **Migration plan:** See `plans/research.md` for the roadmap to implement all 19 PowerLibs component categories. The project is currently in Phase 5 (Galleries, Calendars, Animations). Before implementing new features, check the plan to ensure alignment with the phased rollout.
 
 **Verification checklist:** Track completed categories in `plans/research.md` under "TODO List for Implementation"
+
+## Development Server Troubleshooting
+
+**JSON parsing errors:**
+- Symptom: `Error: Unexpected token '<', "<!doctype "... is not valid JSON`
+- Cause: Wrangler server not running or proxy misconfigured
+- Fix: Ensure `npm run dev` starts both servers, check console for port conflicts
+
+**API requests failing:**
+- Symptom: 404 errors for `/api/*` endpoints
+- Cause: Wrangler not responding or D1 database not initialized
+- Fix: Check Wrangler output, verify database bindings in `wrangler.toml`
+
+**Port conflicts:**
+- Symptom: "Port already in use" errors
+- Fix: Kill processes on ports 5173 or 8788, or configure different ports
 
 ## Deployment
 
