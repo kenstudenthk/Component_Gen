@@ -1,4 +1,4 @@
-export function Hero({ activeFilter, setActiveFilter }) {
+export function Hero({ activeFilter, setActiveFilter, totalComponents }) {
   const filters = ['Categories', 'Full Apps', 'Custom Libraries', 'Tools'];
 
   return (
@@ -8,7 +8,11 @@ export function Hero({ activeFilter, setActiveFilter }) {
           Component Library
         </div>
         <h1 className="mb-6 text-4xl font-extrabold tracking-tight text-white sm:text-5xl lg:text-6xl">
-          Choose a component out of <span className="text-blue-500">93</span> to explore.
+          Choose a component out of{" "}
+          <span className="text-blue-500">
+            {totalComponents > 0 ? totalComponents : "…"}
+          </span>{" "}
+          to explore.
         </h1>
         <p className="mx-auto max-w-2xl text-lg text-slate-400">
           Each category contains ready-to-use components that you can copy directly into your Power Apps.

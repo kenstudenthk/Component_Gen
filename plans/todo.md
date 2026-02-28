@@ -70,19 +70,21 @@ To allow me to commit these files to the main branch, **you must approve this pl
 - [ ] Ensure all 19 categories displayed properly
 - **Files:** `src/lib/templates.js`
 
-### Task 5: Library Page Enhancements ⬜
-- [ ] Add component count per category card
-- [ ] Add missing category icons
-- [ ] Sort categories by `sort_order` from DB
-- [ ] Add "Showing X of Y" count on category pages
-- **Files:** `src/pages/Library.jsx`, `src/pages/Category.jsx`
+### Task 5: Library Page Enhancements ✅
+- [x] Add component count per category card (real count from DB via API JOIN)
+- [x] Add icons for all 19 categories (SLUG_TO_ICON mapping)
+- [x] Sort categories by `sort_order` from DB (API returns sorted)
+- [x] Add "Showing X of Y" count on category pages
+- [x] Fix broken slugs (badge→badges, drawer→drawers, navigation-bars→navigation)
+- [x] Dynamic loading instead of hardcoded CLONE_CATEGORIES
+- **Files:** `src/components/landing/CategoryGrid.jsx`, `src/pages/Category.jsx`, `functions/api/categories.js`
 
-### Task 6: Search Functionality ⬜
-- [ ] Add global search bar to `/library` page
-- [ ] Implement search by component name and tags
-- [ ] Show results grouped by category
-- [ ] Add in-category search filter
-- **Files:** `src/pages/Library.jsx`
+### Task 6: Search Functionality ✅
+- [x] Add global search bar to `/library` page (with debounce 300ms)
+- [x] Implement search by component name and tags (API `?search=` param)
+- [x] Show results grouped by category
+- [x] Add in-category search filter on Category page
+- **Files:** `src/pages/Library.jsx`, `src/lib/api.js`, `functions/api/components.js`
 
 ---
 

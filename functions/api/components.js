@@ -2,15 +2,21 @@ export async function onRequestGet(context) {
   const { DB } = context.env;
   const url = new URL(context.request.url);
   const category = url.searchParams.get("category");
+  const search = url.searchParams.get("search");
 
   let stmt;
-  if (category) {
+  if (search) {
+    const pattern = `%${search}%`;
     stmt = DB.prepare(
-      "SELECT id, name, category_slug, description, yaml, tags, sort_order, created_at FROM components WHERE category_slug = ? ORDER BY sort_order ASC, created_at ASC"
+      "SELECT id, name, category_slug, description, yaml, tags, sort_order, created_at FROM components WHERE name LIKE ? OR tags LIKE ? ORDER BY name ASC",
+    ).bind(pattern, pattern);
+  } else if (category) {
+    stmt = DB.prepare(
+      "SELECT id, name, category_slug, description, yaml, tags, sort_order, created_at FROM components WHERE category_slug = ? ORDER BY sort_order ASC, created_at ASC",
     ).bind(category);
   } else {
     stmt = DB.prepare(
-      "SELECT id, name, category_slug, description, yaml, tags, sort_order, created_at FROM components ORDER BY sort_order ASC, created_at ASC"
+      "SELECT id, name, category_slug, description, yaml, tags, sort_order, created_at FROM components ORDER BY sort_order ASC, created_at ASC",
     );
   }
 
@@ -33,7 +39,7 @@ export async function onRequestPost(context) {
   if (!name || !category_slug || !yaml) {
     return Response.json(
       { error: "name, category_slug, and yaml are required" },
-      { status: 400 }
+      { status: 400 },
     );
   }
 
@@ -41,7 +47,7 @@ export async function onRequestPost(context) {
   const now = new Date().toISOString();
 
   await DB.prepare(
-    "INSERT INTO components (id, name, category_slug, description, yaml, tags, sort_order, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)"
+    "INSERT INTO components (id, name, category_slug, description, yaml, tags, sort_order, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
   )
     .bind(
       id,
@@ -52,12 +58,12 @@ export async function onRequestPost(context) {
       tags ?? null,
       sort_order ?? 0,
       now,
-      now
+      now,
     )
     .run();
 
   const created = await DB.prepare(
-    "SELECT id, name, category_slug, description, yaml, tags, sort_order, created_at, updated_at FROM components WHERE id = ?"
+    "SELECT id, name, category_slug, description, yaml, tags, sort_order, created_at, updated_at FROM components WHERE id = ?",
   )
     .bind(id)
     .first();
