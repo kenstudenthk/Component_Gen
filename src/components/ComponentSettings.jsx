@@ -117,8 +117,171 @@ export default function ComponentSettings({ settings, setSettings }) {
 
   return (
     <div className="p-6 space-y-8 max-h-[500px] overflow-y-auto custom-scrollbar">
+      {/* Custom Component Dynamic Form */}
+      {settings.type === 'customComponent' && settings.customProperties && (
+        <div className="space-y-4">
+          <h3 className="text-sm font-bold text-white uppercase tracking-wider mb-4">Component Properties</h3>
+
+          {Object.entries(settings.customProperties).map(([key, prop]) => (
+            <div key={key} className="space-y-2">
+              <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+                {prop.displayName}
+                {prop.description && (
+                  <span className="text-slate-500 text-[9px] ml-2 font-normal normal-case">
+                    ({prop.description})
+                  </span>
+                )}
+              </label>
+
+              {/* Number input */}
+              {prop.dataType === 'Number' && (
+                <input
+                  type="number"
+                  value={settings.customPropertyValues?.[key] || prop.default?.replace('=', '') || 0}
+                  onChange={(e) => setSettings({
+                    ...settings,
+                    customPropertyValues: {
+                      ...settings.customPropertyValues,
+                      [key]: e.target.value
+                    }
+                  })}
+                  className="w-full bg-[#1A1A1A] border border-white/5 rounded-lg px-3 py-2 text-xs text-white focus:ring-1 focus:ring-blue-500 outline-none"
+                />
+              )}
+
+              {/* Text input */}
+              {prop.dataType === 'Text' && (
+                <input
+                  type="text"
+                  value={settings.customPropertyValues?.[key] || prop.default?.replace(/^=|"/g, '') || ''}
+                  onChange={(e) => setSettings({
+                    ...settings,
+                    customPropertyValues: {
+                      ...settings.customPropertyValues,
+                      [key]: e.target.value
+                    }
+                  })}
+                  className="w-full bg-[#1A1A1A] border border-white/5 rounded-lg px-3 py-2 text-xs text-white focus:ring-1 focus:ring-blue-500 outline-none"
+                />
+              )}
+
+              {/* Boolean checkbox */}
+              {prop.dataType === 'Boolean' && (
+                <label className="flex items-center gap-2 p-3 bg-[#1A1A1A] border border-white/5 rounded-lg cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={
+                      settings.customPropertyValues?.[key] === 'true' ||
+                      settings.customPropertyValues?.[key] === true ||
+                      prop.default?.includes('true')
+                    }
+                    onChange={(e) => setSettings({
+                      ...settings,
+                      customPropertyValues: {
+                        ...settings.customPropertyValues,
+                        [key]: e.target.checked ? 'true' : 'false'
+                      }
+                    })}
+                    className="w-4 h-4 rounded border-white/10 bg-[#0D0D0D]"
+                  />
+                  <span className="text-xs text-slate-300">Enabled</span>
+                </label>
+              )}
+
+              {/* Color picker */}
+              {prop.dataType === 'Color' && (
+                <div className="flex gap-2">
+                  <input
+                    type="color"
+                    value={
+                      // Try to extract hex from RGBA or use default
+                      (() => {
+                        const val = settings.customPropertyValues?.[key] || prop.default || '#3B82F6';
+                        const rgbaMatch = val.match(/RGBA\((\d+),\s*(\d+),\s*(\d+)/);
+                        if (rgbaMatch) {
+                          const [, r, g, b] = rgbaMatch;
+                          return `#${parseInt(r).toString(16).padStart(2, '0')}${parseInt(g).toString(16).padStart(2, '0')}${parseInt(b).toString(16).padStart(2, '0')}`;
+                        }
+                        return val;
+                      })()
+                    }
+                    onChange={(e) => {
+                      // Convert hex to RGBA format
+                      const hex = e.target.value;
+                      const r = parseInt(hex.slice(1,3), 16);
+                      const g = parseInt(hex.slice(3,5), 16);
+                      const b = parseInt(hex.slice(5,7), 16);
+                      setSettings({
+                        ...settings,
+                        customPropertyValues: {
+                          ...settings.customPropertyValues,
+                          [key]: `RGBA(${r}, ${g}, ${b}, 1)`
+                        }
+                      });
+                    }}
+                    className="w-16 h-10 border border-white/10 rounded-lg bg-[#1A1A1A] cursor-pointer"
+                  />
+                  <input
+                    type="text"
+                    value={settings.customPropertyValues?.[key] || prop.default || 'RGBA(59, 130, 246, 1)'}
+                    onChange={(e) => setSettings({
+                      ...settings,
+                      customPropertyValues: {
+                        ...settings.customPropertyValues,
+                        [key]: e.target.value
+                      }
+                    })}
+                    placeholder="RGBA(59, 130, 246, 1)"
+                    className="flex-1 bg-[#1A1A1A] border border-white/5 rounded-lg px-3 py-2 text-xs text-white font-mono focus:ring-1 focus:ring-blue-500 outline-none"
+                  />
+                </div>
+              )}
+
+              {/* Table/complex data textarea */}
+              {prop.dataType === 'Table' && (
+                <textarea
+                  value={settings.customPropertyValues?.[key] || prop.default || ''}
+                  onChange={(e) => setSettings({
+                    ...settings,
+                    customPropertyValues: {
+                      ...settings.customPropertyValues,
+                      [key]: e.target.value
+                    }
+                  })}
+                  rows={4}
+                  className="w-full bg-[#1A1A1A] border border-white/5 rounded-lg px-3 py-2 text-xs text-white font-mono resize-none focus:ring-1 focus:ring-blue-500 outline-none"
+                  placeholder="Enter formula or data..."
+                />
+              )}
+
+              {/* Generic fallback for other types */}
+              {!['Number', 'Text', 'Boolean', 'Color', 'Table'].includes(prop.dataType) && (
+                <input
+                  type="text"
+                  value={settings.customPropertyValues?.[key] || prop.default?.replace(/^=/, '') || ''}
+                  onChange={(e) => setSettings({
+                    ...settings,
+                    customPropertyValues: {
+                      ...settings.customPropertyValues,
+                      [key]: e.target.value
+                    }
+                  })}
+                  className="w-full bg-[#1A1A1A] border border-white/5 rounded-lg px-3 py-2 text-xs text-white focus:ring-1 focus:ring-blue-500 outline-none"
+                  placeholder={`${prop.dataType} value`}
+                />
+              )}
+            </div>
+          ))}
+
+          {Object.keys(settings.customProperties).length === 0 && (
+            <p className="text-slate-500 text-xs italic">No editable properties available for this component.</p>
+          )}
+        </div>
+      )}
+
       {/* AI Assistant Section */}
-      <section className="bg-gradient-to-br from-blue-900/10 to-transparent border border-blue-500/10 rounded-xl p-4 relative overflow-hidden">
+      {settings.type !== 'customComponent' && (
+        <section className="bg-gradient-to-br from-blue-900/10 to-transparent border border-blue-500/10 rounded-xl p-4 relative overflow-hidden">
         <div className="flex items-center gap-2 mb-3">
           <Wand2 className="w-4 h-4 text-blue-400" />
           <h3 className="text-xs font-bold text-white uppercase tracking-tight">
@@ -143,6 +306,7 @@ export default function ComponentSettings({ settings, setSettings }) {
         </div>
         {error && <p className="text-[10px] text-red-400 mt-2">{error}</p>}
       </section>
+      )}
 
       {settings.type === "form" && (
         <div className="space-y-6">

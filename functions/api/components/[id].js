@@ -3,7 +3,7 @@ export async function onRequestGet(context) {
   const { id } = context.params;
 
   const row = await DB.prepare(
-    "SELECT id, name, category_slug, description, yaml, tags, sort_order, created_at, updated_at FROM components WHERE id = ?"
+    "SELECT id, name, category_slug, description, yaml, tags, sort_order, component_type, custom_properties, preview_image_url, created_at, updated_at FROM components WHERE id = ?"
   )
     .bind(id)
     .first();
@@ -43,6 +43,18 @@ export async function onRequestPut(context) {
     );
   }
 
+  // Validate category exists
+  const categoryCheck = await DB.prepare(
+    'SELECT slug FROM categories WHERE slug = ?'
+  ).bind(category_slug).first();
+
+  if (!categoryCheck) {
+    return Response.json(
+      { error: `Invalid category: ${category_slug}` },
+      { status: 400 }
+    );
+  }
+
   const now = new Date().toISOString();
 
   await DB.prepare(
@@ -61,7 +73,7 @@ export async function onRequestPut(context) {
     .run();
 
   const updated = await DB.prepare(
-    "SELECT id, name, category_slug, description, yaml, tags, sort_order, created_at, updated_at FROM components WHERE id = ?"
+    "SELECT id, name, category_slug, description, yaml, tags, sort_order, component_type, custom_properties, preview_image_url, created_at, updated_at FROM components WHERE id = ?"
   )
     .bind(id)
     .first();

@@ -5,6 +5,45 @@ export default function ComponentPreview({ settings }) {
   return (
     <div className="h-full min-h-[400px] flex flex-col items-center justify-center bg-white rounded-2xl overflow-hidden p-10 relative shadow-inner border border-slate-100">
       <div className="flex-1 flex items-center justify-center w-full">
+        {/* Custom Component Preview */}
+        {settings.type === 'customComponent' && (
+          <div className="flex items-center justify-center h-full w-full">
+            {settings.previewImageUrl ? (
+              <img
+                src={settings.previewImageUrl}
+                alt={settings.name || 'Custom Component'}
+                className="max-w-full max-h-full object-contain rounded-lg shadow-lg"
+              />
+            ) : (
+              <div className="text-center p-12 max-w-md">
+                <div className="w-20 h-20 mx-auto mb-6 rounded-2xl bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center shadow-xl">
+                  <Sparkles className="w-10 h-10 text-white" />
+                </div>
+                <h3 className="font-bold text-xl text-slate-900 mb-2">
+                  {settings.name || 'Custom Component'}
+                </h3>
+                <p className="text-sm text-slate-500 mb-4">
+                  Custom Power Apps Canvas Component
+                </p>
+                <div className="bg-blue-50 border border-blue-100 rounded-xl p-4 text-left">
+                  <p className="text-xs text-blue-900 font-semibold mb-2">
+                    ✨ Imported from PowerLibs
+                  </p>
+                  <p className="text-[10px] text-blue-700 leading-relaxed">
+                    This is a complex ComponentDefinition with custom properties.
+                    Edit properties in the settings panel and copy the YAML to use in Power Apps.
+                  </p>
+                </div>
+                {settings.customProperties && Object.keys(settings.customProperties).length > 0 && (
+                  <div className="mt-4 text-xs text-slate-400">
+                    <span className="font-semibold">{Object.keys(settings.customProperties).length}</span> editable properties
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+        )}
+
         {settings.type === "form" && (
           <div className="w-full max-w-md bg-white rounded-2xl shadow-2xl p-6 border border-slate-100 scale-90">
             <div className="mb-6">
