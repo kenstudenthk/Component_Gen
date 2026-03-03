@@ -77,7 +77,7 @@ export default function ComponentSettings({ settings, setSettings }) {
         })),
       }));
       setAiPrompt("");
-    } catch (err) {
+    } catch {
       setError("Failed to generate form.");
     } finally {
       setAiLoading(false);
@@ -108,7 +108,7 @@ export default function ComponentSettings({ settings, setSettings }) {
         setSettings((prev) => ({ ...prev, fillColor: parsed.primaryColor }));
       }
       setAiPrompt("");
-    } catch (err) {
+    } catch {
       setError("Style suggestion failed.");
     } finally {
       setAiLoading(false);
@@ -438,6 +438,54 @@ export default function ComponentSettings({ settings, setSettings }) {
                 <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Thickness</label>
                 <input type="number" value={settings.borderThickness} onChange={(e) => setSettings({...settings, borderThickness: parseInt(e.target.value) || 0})} className="w-full bg-[#1A1A1A] border border-white/5 rounded-lg px-3 py-2 text-xs text-white" />
               </div>
+            </div>
+          )}
+
+          {settings.icon !== undefined && (
+            <div className="grid grid-cols-2 gap-4 pt-2">
+              <div className="space-y-2">
+                <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Icon</label>
+                <input type="text" value={settings.icon || ""} onChange={(e) => setSettings({...settings, icon: e.target.value})} className="w-full bg-[#1A1A1A] border border-white/5 rounded-lg px-3 py-2 text-xs text-white" placeholder="Icon name" />
+              </div>
+              <div className="space-y-2">
+                <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Icon Position</label>
+                <select value={settings.iconPosition || "left"} onChange={(e) => setSettings({...settings, iconPosition: e.target.value})} className="w-full bg-[#1A1A1A] border border-white/5 rounded-lg px-3 py-2 text-xs text-white">
+                  <option value="left">Left</option>
+                  <option value="right">Right</option>
+                </select>
+              </div>
+            </div>
+          )}
+
+          {settings.loadingState !== undefined && (
+            <div className="grid grid-cols-2 gap-4 pt-2">
+              <div className="flex items-center justify-between p-3 bg-[#1A1A1A] border border-white/5 rounded-lg">
+                <span className="text-xs font-bold text-slate-300">Loading State</span>
+                <input
+                  type="checkbox"
+                  checked={settings.loadingState}
+                  onChange={(e) => setSettings({ ...settings, loadingState: e.target.checked })}
+                  className="w-4 h-4"
+                />
+              </div>
+              {settings.spinnerColor !== undefined && (
+                <div className="space-y-2">
+                  <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Spinner Color</label>
+                  <input type="text" value={settings.spinnerColor || ""} onChange={(e) => setSettings({...settings, spinnerColor: e.target.value})} className="w-full bg-[#1A1A1A] border border-white/5 rounded-lg px-3 py-2 text-xs text-white" />
+                </div>
+              )}
+            </div>
+          )}
+
+          {settings.dropShadow !== undefined && (
+            <div className="flex items-center justify-between p-3 bg-[#1A1A1A] border border-white/5 rounded-lg mt-2">
+              <span className="text-xs font-bold text-slate-300">Drop Shadow</span>
+              <input
+                type="checkbox"
+                checked={settings.dropShadow}
+                onChange={(e) => setSettings({ ...settings, dropShadow: e.target.checked })}
+                className="w-4 h-4"
+              />
             </div>
           )}
         </div>

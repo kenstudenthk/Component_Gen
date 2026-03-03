@@ -193,10 +193,10 @@ export const INITIAL_SIDEBAR_ITEMS = [
   {
     group: "Forms & Inputs",
     items: [
+      { label: "Forms", icon: Layout },
       { label: "Input Fields", icon: Type },
       { label: "Toggles", icon: CheckSquare },
       { label: "Dropdowns", icon: ChevronDown },
-      { label: "Dynamic Form Card", icon: Layout },
     ],
   },
   {
@@ -214,15 +214,15 @@ export const INITIAL_SIDEBAR_ITEMS = [
     items: [
       { label: "Cards", icon: Square },
       { label: "Accordions", icon: Box },
-      { label: "Badge", icon: Box },
-      { label: "Gallery", icon: Layout },
+      { label: "Badges", icon: Box },
+      { label: "Galleries", icon: Layout },
       { label: "Calendars", icon: Calendar },
     ],
   },
   {
     group: "Feedback & Motion",
     items: [
-      { label: "Toast", icon: Bell },
+      { label: "Toasts", icon: Bell },
       { label: "Modals", icon: AppWindow },
       { label: "Animations", icon: Play },
     ],
