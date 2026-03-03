@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { Copy, Check, Eye, Settings as SettingsIcon } from "lucide-react";
 import ComponentPreview from "./ComponentPreview";
 import ComponentSettings from "./ComponentSettings";
@@ -8,8 +8,9 @@ import { generatePowerAppsYAML, parsePowerAppsYAMLToSettings } from "../lib/yaml
 export default function ComponentCard({ component }) {
   const [activeTab, setActiveTab] = useState("Preview");
   const [copied, setCopied] = useState(false);
+  const [settings, setSettings] = useState(null);
 
-  const defaultSettings = useMemo(() => {
+  useEffect(() => {
     // Map category slugs to component types expected by Preview/Settings
     const typeMap = {
       "accordions": "accordion",
@@ -31,20 +32,55 @@ export default function ComponentCard({ component }) {
       "speed-dial": "speedDial",
       "tabs": "tab",
       "toast": "toast",
-      "toggles": "toggle"
+      "toggles": "toggle",
+      "custom-components": "customComponent"
     };
 
-    const mappedType = typeMap[component.category_slug] || component.category_slug || "button";
+    // For custom components, check the component_type field from database
+    let mappedType;
+    if (component.component_type === 'definition' || component.category_slug === 'custom-components') {
+      mappedType = 'customComponent';
+    } else {
+      mappedType = typeMap[component.category_slug] || component.category_slug || "button";
+    }
 
-    // Try to find default settings in INITIAL_TEMPLATES by name
-    let defaultSettings = INITIAL_TEMPLATES[component.name] ||
-                          INITIAL_TEMPLATES[component.name.replace(/Classic Button/i, "Classic Button")];
+    // Handle custom components specially
+    let defaultSettings;
 
-    if (!defaultSettings) {
-      // Parse settings from the component's YAML if it exists
-      if (component.yaml) {
-        defaultSettings = parsePowerAppsYAMLToSettings(component.yaml, mappedType, component.name);
-      } else {
+    if (mappedType === 'customComponent') {
+      // Parse custom properties from stored JSON or YAML
+      const customProperties = component.custom_properties
+        ? (typeof component.custom_properties === 'string'
+            ? JSON.parse(component.custom_properties)
+            : component.custom_properties)
+        : {};
+
+      defaultSettings = {
+        type: 'customComponent',
+        name: component.name,
+        baseYaml: component.yaml,
+        yaml: component.yaml,
+        customProperties: customProperties,
+        customPropertyValues: {},
+        previewImageUrl: component.preview_image_url || null
+      };
+
+      // Extract default values for form
+      for (const [key, prop] of Object.entries(customProperties)) {
+        if (prop.default) {
+          defaultSettings.customPropertyValues[key] = prop.default.replace(/^=/, '');
+        }
+      }
+    } else {
+      // Try to find default settings in INITIAL_TEMPLATES by name
+      defaultSettings = INITIAL_TEMPLATES[component.name] ||
+                        INITIAL_TEMPLATES[component.name.replace(/Classic Button/i, "Classic Button")];
+
+      if (!defaultSettings) {
+        // Parse settings from the component's YAML if it exists
+        if (component.yaml) {
+          defaultSettings = parsePowerAppsYAMLToSettings(component.yaml, mappedType, component.name);
+        } else {
         // Fallback with robust default properties based on type
         if (mappedType === "button") {
           defaultSettings = { type: "button", text: component.name, fillColor: "=RGBA(59, 130, 246, 1)", textColor: "=RGBA(255, 255, 255, 1)", radius: 4, width: 160 };
@@ -63,21 +99,14 @@ export default function ComponentCard({ component }) {
         }
       }
     }
+    }
 
-    return {
+    setSettings({
       ...defaultSettings,
       name: component.name,
       description: component.description,
-    };
+    });
   }, [component]);
-
-  const [settings, setSettings] = useState(() => defaultSettings);
-
-  // Reset settings when component prop changes (necessary to sync with parent data)
-  useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setSettings(defaultSettings);
-  }, [component.id, defaultSettings]);
 
   const handleCopy = async () => {
     const yaml = settings ? generatePowerAppsYAML(settings.name, settings) : component.yaml;
@@ -116,27 +145,29 @@ export default function ComponentCard({ component }) {
           </p>
         </div>
 
-        {/* Segmented Control Toggle */}
-        <div className="flex bg-[#0D0D0D] rounded-lg border border-white/5 p-1 shrink-0 gap-1">
+        {/* Toggle UI */}
+        <div className="flex bg-[#0D0D0D] rounded-lg border border-white/5 p-0.5 shrink-0">
           <button
             onClick={() => setActiveTab("Preview")}
-            className={`px-3 py-1 rounded-md text-[11px] font-semibold transition-all ${
+            className={`p-1.5 rounded-md transition-all ${
               activeTab === "Preview"
                 ? "bg-[#1A1A1A] text-blue-400 shadow-sm border border-white/5"
-                : "text-slate-500 hover:text-slate-300"
+                : "text-slate-600 hover:text-slate-400"
             }`}
+            title="Preview"
           >
-            Preview
+            <Eye size={14} />
           </button>
           <button
             onClick={() => setActiveTab("Edit")}
-            className={`px-3 py-1 rounded-md text-[11px] font-semibold transition-all ${
+            className={`p-1.5 rounded-md transition-all ${
               activeTab === "Edit"
                 ? "bg-[#1A1A1A] text-blue-400 shadow-sm border border-white/5"
-                : "text-slate-500 hover:text-slate-300"
+                : "text-slate-600 hover:text-slate-400"
             }`}
+            title="Edit"
           >
-            Edit
+            <SettingsIcon size={14} />
           </button>
         </div>
 

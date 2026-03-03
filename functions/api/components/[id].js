@@ -3,7 +3,7 @@ export async function onRequestGet(context) {
   const { id } = context.params;
 
   const row = await DB.prepare(
-    "SELECT id, name, category_slug, description, yaml, tags, sort_order, preview_url, created_at, updated_at FROM components WHERE id = ?"
+    "SELECT id, name, category_slug, description, yaml, tags, sort_order, preview_url, created_at, updated_at FROM components WHERE id = ?",
   )
     .bind(id)
     .first();
@@ -39,14 +39,27 @@ export async function onRequestPut(context) {
   if (!name || !category_slug || !yaml) {
     return Response.json(
       { error: "name, category_slug, and yaml are required" },
-      { status: 400 }
+      { status: 400 },
+    );
+  }
+
+  const categoryCheck = await DB.prepare(
+    "SELECT slug FROM categories WHERE slug = ?",
+  )
+    .bind(category_slug)
+    .first();
+
+  if (!categoryCheck) {
+    return Response.json(
+      { error: `Invalid category: ${category_slug}` },
+      { status: 400 },
     );
   }
 
   const now = new Date().toISOString();
 
   await DB.prepare(
-    "UPDATE components SET name = ?, category_slug = ?, description = ?, yaml = ?, tags = ?, sort_order = ?, preview_url = ?, updated_at = ? WHERE id = ?"
+    "UPDATE components SET name = ?, category_slug = ?, description = ?, yaml = ?, tags = ?, sort_order = ?, preview_url = ?, updated_at = ? WHERE id = ?",
   )
     .bind(
       name,
@@ -57,12 +70,12 @@ export async function onRequestPut(context) {
       sort_order ?? 0,
       preview_url ?? null,
       now,
-      id
+      id,
     )
     .run();
 
   const updated = await DB.prepare(
-    "SELECT id, name, category_slug, description, yaml, tags, sort_order, preview_url, created_at, updated_at FROM components WHERE id = ?"
+    "SELECT id, name, category_slug, description, yaml, tags, sort_order, preview_url, created_at, updated_at FROM components WHERE id = ?",
   )
     .bind(id)
     .first();

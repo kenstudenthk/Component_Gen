@@ -15,6 +15,14 @@ export async function getComponents(categorySlug) {
   return res.json();
 }
 
+export async function searchComponents(query) {
+  const res = await fetch(
+    `${BASE}/components?search=${encodeURIComponent(query)}`,
+  );
+  if (!res.ok) throw new Error("Failed to search components");
+  return res.json();
+}
+
 export async function getComponent(id) {
   const res = await fetch(`${BASE}/components/${id}`);
   if (!res.ok) throw new Error("Failed to fetch component");

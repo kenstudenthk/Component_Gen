@@ -1,81 +1,131 @@
 import { useState, useEffect } from "react";
 import { Search, X } from "lucide-react";
-import Navbar from "../components/Navbar";
-import CategoryGrid from "../components/CategoryGrid";
-import { getCategories } from "../lib/api";
+import { Header } from "../components/landing/Header";
+import { Hero } from "../components/landing/Hero";
+import { CategoryGrid } from "../components/landing/CategoryGrid";
+import { Footer } from "../components/landing/Footer";
+import ComponentCard from "../components/ComponentCard";
+import { getCategories, searchComponents } from "../lib/api";
+
+function useDebounce(value, delay) {
+  const [debounced, setDebounced] = useState(value);
+  useEffect(() => {
+    const t = setTimeout(() => setDebounced(value), delay);
+    return () => clearTimeout(t);
+  }, [value, delay]);
+  return debounced;
+}
 
 export default function Library() {
-  const [categories, setCategories] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [activeFilter, setActiveFilter] = useState("Categories");
+  const [totalComponents, setTotalComponents] = useState(0);
   const [searchQuery, setSearchQuery] = useState("");
+  const [searchResults, setSearchResults] = useState([]);
+  const [searchLoading, setSearchLoading] = useState(false);
+
+  const debouncedQuery = useDebounce(searchQuery, 300);
 
   useEffect(() => {
     getCategories()
-      .then(setCategories)
-      .catch((e) => setError(e.message))
-      .finally(() => setLoading(false));
+      .then((cats) => {
+        const total = cats.reduce(
+          (sum, c) => sum + (c.component_count ?? 0),
+          0,
+        );
+        setTotalComponents(total);
+      })
+      .catch(console.error);
   }, []);
 
-  const filteredCategories = searchQuery
-    ? categories.filter((cat) =>
-        cat.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        cat.description?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        cat.slug.toLowerCase().includes(searchQuery.toLowerCase())
-      )
-    : categories;
+  useEffect(() => {
+    if (!debouncedQuery.trim()) return;
+    setSearchLoading(true);
+    searchComponents(debouncedQuery)
+      .then(setSearchResults)
+      .catch(console.error)
+      .finally(() => setSearchLoading(false));
+  }, [debouncedQuery]);
+
+  // Group search results by category
+  const groupedResults = searchResults.reduce((acc, comp) => {
+    const key = comp.category_slug;
+    if (!acc[key]) acc[key] = [];
+    acc[key].push(comp);
+    return acc;
+  }, {});
+
+  const isSearching = searchQuery.trim().length > 0;
 
   return (
-    <div className="min-h-screen flex flex-col">
-      <Navbar />
-      <main className="flex-1 mx-auto w-full max-w-7xl px-6 py-10">
-        <h1 className="text-2xl font-bold text-white mb-1">Component Library</h1>
-        <p className="text-slate-400 text-sm mb-6">
-          Select a category to browse components.
-        </p>
+    <div className="min-h-screen flex flex-col bg-[#0A0A0A] font-sans text-white">
+      <Header />
+      <main className="flex-1">
+        <Hero
+          activeFilter={activeFilter}
+          setActiveFilter={setActiveFilter}
+          totalComponents={totalComponents}
+        />
 
-        {/* Search Bar */}
-        <div className="relative mb-8">
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500" size={18} />
-          <input
-            type="text"
-            placeholder="Search categories..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full bg-slate-900 border border-slate-800 rounded-xl pl-12 pr-12 py-3 text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-          />
-          {searchQuery && (
-            <button
-              onClick={() => setSearchQuery("")}
-              className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-300 transition-colors"
-            >
-              <X size={18} />
-            </button>
-          )}
+        {/* Global Search Bar */}
+        <div className="mx-auto max-w-2xl px-6 pb-8">
+          <div className="relative">
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 size-4 text-slate-500 pointer-events-none" />
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Search components by name or tag…"
+              className="w-full rounded-xl border border-white/10 bg-white/5 pl-11 pr-10 py-3 text-sm text-white placeholder:text-slate-500 focus:border-blue-500/50 focus:bg-white/8 focus:outline-none transition-colors"
+            />
+            {searchQuery && (
+              <button
+                onClick={() => setSearchQuery("")}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-white transition-colors"
+              >
+                <X className="size-4" />
+              </button>
+            )}
+          </div>
         </div>
 
-        {loading && (
-          <p className="text-slate-500 text-sm">Loading categories…</p>
-        )}
-        {error && (
-          <p className="text-red-400 text-sm">Error: {error}</p>
-        )}
-        {!loading && !error && filteredCategories.length === 0 && (
-          <p className="text-slate-500 text-sm">
-            No categories found matching "{searchQuery}"
-          </p>
-        )}
-        {!loading && !error && filteredCategories.length > 0 && (
-          <>
-            {searchQuery && (
-              <p className="text-slate-400 text-sm mb-4">
-                Found <span className="font-bold text-blue-400">{filteredCategories.length}</span> {filteredCategories.length === 1 ? "category" : "categories"}
+        {/* Search Results */}
+        {isSearching ? (
+          <section className="mx-auto max-w-7xl px-6 pb-16">
+            {searchLoading ? (
+              <p className="text-slate-500 text-sm text-center py-12">
+                Searching…
               </p>
+            ) : searchResults.length === 0 ? (
+              <p className="text-slate-500 text-sm text-center py-12">
+                No components found for "{searchQuery}"
+              </p>
+            ) : (
+              <>
+                <p className="text-slate-400 text-sm mb-8">
+                  {searchResults.length} result
+                  {searchResults.length !== 1 ? "s" : ""} for "
+                  <span className="text-white font-medium">{searchQuery}</span>"
+                </p>
+                {Object.entries(groupedResults).map(([slug, comps]) => (
+                  <div key={slug} className="mb-12">
+                    <h2 className="text-xs font-bold uppercase tracking-widest text-slate-500 mb-4">
+                      {slug.replace(/-/g, " ")}
+                    </h2>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                      {comps.map((c) => (
+                        <ComponentCard key={c.id} component={c} />
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </>
             )}
-            <CategoryGrid categories={filteredCategories} />
-          </>
+          </section>
+        ) : (
+          <CategoryGrid activeFilter={activeFilter} />
         )}
       </main>
+      <Footer />
     </div>
   );
 }

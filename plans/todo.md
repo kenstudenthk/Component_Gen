@@ -14,50 +14,81 @@ To allow me to commit these files to the main branch, **you must approve this pl
 
 # Project To-Do List
 
-## Phase 0: Initial Version Control
-- [x] Commit all current unstaged and staged changes to the `main` branch.
-- [x] Push changes to the remote repository.
+**Last Updated:** 2026-02-27
 
-## Phase 1: Preparation
-- [x] Read the current structure of `Component/App.jsx` to identify the lines defining `TEMPLATES` and `SIDEBAR_ITEMS`.
-- [x] Understand the structure of the JSON returned by the `/api/components` endpoint.
+## ✅ Completed Phases
 
-## Phase 2: React State Conversion
-- [x] Initialize React `useState` for `templates` using the original `TEMPLATES` object as the default state.
-- [x] Initialize React `useState` for `sidebarItems` using the original `SIDEBAR_ITEMS` array as the default state.
-- [x] Initialize React `useState` for `isLoadingComponents` (default: `true`) to show loading states.
+### Phase 0: Database Cleanup
+- [x] Fix shells → app-shells bug in migrations/002_seed_components.sql
+- [x] Clean production DB duplicates (ButtonStart_N patterns)
+- [x] Verify app-shells category loads
 
-## Phase 3: Data Fetching Logic
-- [x] Create an asynchronous function `fetchComponents()` inside `App`.
-- [x] Inside `fetchComponents()`, use `fetch('/api/components')` and parse the JSON response.
-- [x] Add a `useEffect` hook that runs once (`[]`) on component mount to trigger `fetchComponents()`.
-- [x] Handle fetch errors and ensure `isLoadingComponents` is set to `false` in a `finally` block.
+### Phase 1: Component Library Content
+- [x] Create migrations/003_library_content.sql
+- [x] Add 87 distinct components across 19 categories:
+  - [x] Buttons (8), Forms (5), Input Fields (5)
+  - [x] Toggles (5), Dropdowns (5), Button Groups (3)
+  - [x] Cards (5), Navigation (5), Sidebars (5)
+  - [x] Tabs (5), Modals (6), Toasts (5)
+  - [x] Speed Dial (3), Badges (4), Accordions (4)
+  - [x] App Shells (4), Drawers (4), Galleries (4)
+  - [x] Calendars (3), Animations (3)
+- [x] Verify all components render in preview
+- [x] Verify YAML generation works for all types
 
-## Phase 4: Data Transformation
-- [x] Iterate over the fetched components from the API response.
-- [x] For each component, add it to a temporary copy of the `templates` object with the appropriate structure (`type`, `yaml`, `description`).
-- [x] Collect the new component names and add them as items to the "Your Libraries" group in a temporary copy of the `sidebarItems` array.
-- [x] Call `setTemplates` and `setSidebarItems` with the updated collections.
+### Legacy Phases (From Original Todo)
+- [x] Phase 0: Initial Version Control
+- [x] Phase 1-6: Data fetching, state management, PowerLibs buttons
+- [x] Phase 7: Component Card UI Update (partial - see remaining work below)
 
-## Phase 5: UI & Logic Updates
-- [x] Update the sidebar rendering map (`sidebarItems.map`) to reference the new state variable instead of the constant.
-- [x] Update `handleComponentSelect` to reference the new `templates` state variable instead of the constant.
-- [x] Modify the `handleSaveToD1` function to call `fetchComponents()` upon a successful save to immediately refresh the UI.
+---
 
-## Phase 6: Web Details Updates (PowerLibs Buttons)
-- [x] Add the "Classic Button" template structure with `Text`, `FillColor`, `TextColor`, `CornerRadius` properties.
-- [x] Add the "Classic Icon Button" template structure.
-- [x] Add the "Outline Button" template structure.
-- [x] Add the "Loading Button with Spinner" template structure.
-- [x] Add the "Gradient Button" template structure.
-- [x] Add the "Button Raised" template structure.
+## 🔄 Phase 2: UI/UX Improvements (IN PROGRESS)
 
-## Phase 7: Component Card UI Update (Edit/Preview Toggle)
-- [x] Remove the global Preview/Settings tab bar.
-- [x] Add an "Edit / Preview" segmented control toggle (flipping left/right) onto the component card header.
-- [x] Build a dynamic settings panel in "Edit" mode that conditionally renders input fields based on the component's unique properties.
-- [x] Implement settings inputs for `type: "form"` (title, subtitle, fields).
-- [x] Implement settings inputs for `type: "badge"` (text, theme).
-- [x] Implement settings inputs for `type: "accordion"` (items list).
-- [x] Implement settings inputs for `type: "shell"` (appName, showSidebar, primaryColor).
-- [x] Implement settings inputs for `type: "button"` based on existing properties dynamically (fillColor, textColor, borderColor, gradientStartColor, icon, dropShadow, loadingState, etc.).
+### Task 1: Remove Global Tabs ⬜
+- [ ] Remove global "Preview / Settings" tab bar from main view
+- [ ] Prepare codebase for per-card toggles
+- **Files:** `src/pages/Home.jsx` or main app component
+
+### Task 2: Add Card-Level Edit/Preview Toggle ⬜
+- [ ] Add segmented control toggle to ComponentCard.jsx
+- [ ] Implement "Preview" (left) / "Edit" (right) toggle
+- [ ] Add flip behavior between preview and settings
+- [ ] Apply dark theme styling (`bg-[#1A1A1A]`, `border-white/5`)
+- **Files:** `src/components/ComponentCard.jsx`
+
+### Task 3: Dynamic Settings Panel ⬜
+- [ ] Update ComponentSettings.jsx for conditional rendering
+- [ ] For `type: "button"`: Check for gradient, border, icon, shadow, loading properties
+- [ ] Render appropriate inputs dynamically
+- [ ] Maintain dark theme across all input types
+- **Files:** `src/components/ComponentSettings.jsx`
+
+### Task 4: Sidebar Navigation Updates ⬜
+- [ ] Update INITIAL_SIDEBAR_ITEMS structure
+- [ ] Add section headers/dividers for organization
+- [ ] Ensure all 19 categories displayed properly
+- **Files:** `src/lib/templates.js`
+
+### Task 5: Library Page Enhancements ✅
+- [x] Add component count per category card (real count from DB via API JOIN)
+- [x] Add icons for all 19 categories (SLUG_TO_ICON mapping)
+- [x] Sort categories by `sort_order` from DB (API returns sorted)
+- [x] Add "Showing X of Y" count on category pages
+- [x] Fix broken slugs (badge→badges, drawer→drawers, navigation-bars→navigation)
+- [x] Dynamic loading instead of hardcoded CLONE_CATEGORIES
+- **Files:** `src/components/landing/CategoryGrid.jsx`, `src/pages/Category.jsx`, `functions/api/categories.js`
+
+### Task 6: Search Functionality ✅
+- [x] Add global search bar to `/library` page (with debounce 300ms)
+- [x] Implement search by component name and tags (API `?search=` param)
+- [x] Show results grouped by category
+- [x] Add in-category search filter on Category page
+- **Files:** `src/pages/Library.jsx`, `src/lib/api.js`, `functions/api/components.js`
+
+---
+
+## ⬜ Phase 3: Admin Workflow Improvements (NOT STARTED)
+- [ ] Visual builder for admin (replace raw YAML entry)
+- [ ] Template picker when creating components
+- [ ] Duplicate detection before saving

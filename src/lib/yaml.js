@@ -2,6 +2,139 @@
 // No version pins — Power Apps will use the current version for the environment
 const CONTROL_VERSIONS = {};
 
+// --- ComponentDefinitions YAML Support ---
+// Generate ComponentDefinitions YAML with user-edited properties
+export const generateComponentDefinitionYAML = (customProperties, baseYaml) => {
+  if (!baseYaml || typeof baseYaml !== 'string') {
+    return '# Error: Invalid base YAML';
+  }
+
+  // Parse base YAML
+  const lines = baseYaml.split('\n');
+  const output = [];
+
+  // Rebuild YAML, replacing CustomProperty Default values with user edits
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
+
+    // Check if this is a Default line for a CustomProperty
+    const defaultMatch = line.match(/^\s+Default:\s*=(.+)$/);
+    if (defaultMatch) {
+      // Find which property this belongs to by looking backwards
+      let propertyName = null;
+      for (let j = i - 1; j >= 0; j--) {
+        const propMatch = lines[j].match(/^\s{4}(\w+):\s*$/);
+        if (propMatch) {
+          propertyName = propMatch[1];
+          break;
+        }
+        // Stop if we hit another major section
+        if (lines[j].match(/^\s{2}\w+:/)) break;
+      }
+
+      // Replace with user's edited value if exists
+      if (propertyName && customProperties && customProperties[propertyName] !== undefined) {
+        const userValue = customProperties[propertyName];
+        const indent = line.match(/^(\s+)/)?.[1] || '      ';
+        output.push(`${indent}Default: =${userValue}`);
+        continue;
+      }
+    }
+
+    output.push(line);
+  }
+
+  return output.join('\n');
+};
+
+// Parse CustomProperties from ComponentDefinitions YAML
+export const parseComponentDefinitionYAML = (yaml) => {
+  if (!yaml || typeof yaml !== 'string') return {};
+
+  try {
+    // Simple regex-based parser (avoid js-yaml dependency in browser)
+    const customProperties = {};
+    const lines = yaml.split('\n');
+    let inCustomProperties = false;
+    let currentProperty = null;
+    let propertyKind = null;
+
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i];
+
+      // Detect CustomProperties section
+      if (line.match(/^\s{4}CustomProperties:\s*$/)) {
+        inCustomProperties = true;
+        continue;
+      }
+
+      // Exit CustomProperties section when we hit another major section
+      if (inCustomProperties && line.match(/^\s{4}[A-Z]\w+:\s*$/)) {
+        inCustomProperties = false;
+      }
+
+      if (inCustomProperties) {
+        // Property name (6 spaces indent)
+        const propMatch = line.match(/^\s{6}(\w+):\s*$/);
+        if (propMatch) {
+          currentProperty = propMatch[1];
+          propertyKind = null;
+          customProperties[currentProperty] = {
+            displayName: currentProperty,
+            dataType: 'Text',
+            default: ''
+          };
+          continue;
+        }
+
+        // PropertyKind
+        const kindMatch = line.match(/^\s{8}PropertyKind:\s*(.+)$/);
+        if (kindMatch && currentProperty) {
+          propertyKind = kindMatch[1].trim();
+        }
+
+        // Only include Input properties
+        if (propertyKind !== 'Input') {
+          if (currentProperty && kindMatch) {
+            delete customProperties[currentProperty];
+            currentProperty = null;
+          }
+          continue;
+        }
+
+        // DisplayName
+        const displayMatch = line.match(/^\s{8}DisplayName:\s*(.+)$/);
+        if (displayMatch && currentProperty) {
+          customProperties[currentProperty].displayName = displayMatch[1].trim();
+        }
+
+        // Description
+        const descMatch = line.match(/^\s{8}Description:\s*(.+)$/);
+        if (descMatch && currentProperty) {
+          customProperties[currentProperty].description = descMatch[1].trim();
+        }
+
+        // DataType
+        const typeMatch = line.match(/^\s{8}DataType:\s*(.+)$/);
+        if (typeMatch && currentProperty) {
+          customProperties[currentProperty].dataType = typeMatch[1].trim();
+        }
+
+        // Default value
+        const defaultMatch = line.match(/^\s{8}Default:\s*=(.+)$/);
+        if (defaultMatch && currentProperty) {
+          customProperties[currentProperty].default = defaultMatch[1].trim();
+        }
+      }
+    }
+
+    return customProperties;
+  } catch (err) {
+    console.error('Failed to parse ComponentDefinition YAML:', err);
+    return {};
+  }
+};
+
 export const yamlSafeValue = (value) => {
   if (typeof value !== "string") return value;
   if (value.includes(": ") || value.includes(" #") || /^[[\]{},]/.test(value)) {
@@ -48,6 +181,14 @@ export const sanitizeYamlText = (text) =>
 
 export const generatePowerAppsYAML = (activeComponentName, settings) => {
   const type = settings.type;
+
+  // NEW: Handle custom components (ComponentDefinitions)
+  if (type === "customComponent") {
+    return generateComponentDefinitionYAML(
+      settings.customPropertyValues || {},
+      settings.baseYaml || settings.yaml || ''
+    );
+  }
 
   if (type === "form") {
     const { title, subtitle, fields, primaryButtonText, secondaryButtonText } =
@@ -376,6 +517,18 @@ export const parsePowerAppsYAMLToSettings = (yaml, defaultType = "button", name 
   const settings = { type: defaultType, name };
 
   if (!yaml || typeof yaml !== "string") return settings;
+
+  // Handle custom components (ComponentDefinitions)
+  if (defaultType === "customComponent") {
+    settings.customProperties = parseComponentDefinitionYAML(yaml);
+    settings.baseYaml = yaml;
+    settings.customPropertyValues = {};
+    // Extract default values for form
+    for (const [key, prop] of Object.entries(settings.customProperties)) {
+      settings.customPropertyValues[key] = prop.default.replace(/^=/, '');
+    }
+    return settings;
+  }
 
   if (defaultType === "button") {
     const textMatch = yaml.match(/Text:\s*="([^"]+)"/);

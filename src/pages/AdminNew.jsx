@@ -1,16 +1,9 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { ChevronLeft } from "lucide-react";
 import Navbar from "../components/Navbar";
 import YamlViewer from "../components/YamlViewer";
-import { createComponent } from "../lib/api";
-
-const CATEGORY_SLUGS = [
-  "accordions", "animations", "app-shells", "badges", "button-group",
-  "buttons", "calendars", "cards", "drawers", "dropdowns", "gallery",
-  "forms", "input-fields", "modals", "navigation", "sidebars", 
-  "speed-dial", "tabs", "toast", "toggles"
-];
+import { createComponent, getCategories } from "../lib/api";
 
 const EMPTY_FORM = {
   name: "",
@@ -23,8 +16,15 @@ const EMPTY_FORM = {
 export default function AdminNew() {
   const navigate = useNavigate();
   const [form, setForm] = useState(EMPTY_FORM);
+  const [categories, setCategories] = useState([]);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState(null);
+
+  useEffect(() => {
+    getCategories()
+      .then(setCategories)
+      .catch((e) => console.error('Failed to load categories:', e));
+  }, []);
 
   const set = (field) => (e) =>
     setForm((f) => ({ ...f, [field]: e.target.value }));
@@ -83,9 +83,9 @@ export default function AdminNew() {
               onChange={set("category_slug")}
               className="rounded-lg border border-slate-700 bg-slate-900 px-3 py-2 text-sm text-white focus:outline-none focus:border-blue-500 transition-colors"
             >
-              {CATEGORY_SLUGS.map((s) => (
-                <option key={s} value={s}>
-                  {s.charAt(0).toUpperCase() + s.slice(1)}
+              {categories.map((cat) => (
+                <option key={cat.slug} value={cat.slug}>
+                  {cat.name}
                 </option>
               ))}
             </select>
