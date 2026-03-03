@@ -6,11 +6,11 @@ export async function onRequestGet(context) {
   let stmt;
   if (category) {
     stmt = DB.prepare(
-      "SELECT id, name, category_slug, description, yaml, tags, sort_order, created_at FROM components WHERE category_slug = ? ORDER BY sort_order ASC, created_at ASC"
+      "SELECT id, name, category_slug, description, yaml, tags, sort_order, preview_url, created_at FROM components WHERE category_slug = ? ORDER BY sort_order ASC, created_at ASC"
     ).bind(category);
   } else {
     stmt = DB.prepare(
-      "SELECT id, name, category_slug, description, yaml, tags, sort_order, created_at FROM components ORDER BY sort_order ASC, created_at ASC"
+      "SELECT id, name, category_slug, description, yaml, tags, sort_order, preview_url, created_at FROM components ORDER BY sort_order ASC, created_at ASC"
     );
   }
 
@@ -28,7 +28,7 @@ export async function onRequestPost(context) {
     return Response.json({ error: "Invalid JSON" }, { status: 400 });
   }
 
-  const { name, category_slug, description, yaml, tags, sort_order } = body;
+  const { name, category_slug, description, yaml, tags, sort_order, preview_url } = body;
 
   if (!name || !category_slug || !yaml) {
     return Response.json(
@@ -41,7 +41,7 @@ export async function onRequestPost(context) {
   const now = new Date().toISOString();
 
   await DB.prepare(
-    "INSERT INTO components (id, name, category_slug, description, yaml, tags, sort_order, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)"
+    "INSERT INTO components (id, name, category_slug, description, yaml, tags, sort_order, preview_url, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
   )
     .bind(
       id,
@@ -51,13 +51,14 @@ export async function onRequestPost(context) {
       yaml,
       tags ?? null,
       sort_order ?? 0,
+      preview_url ?? null,
       now,
       now
     )
     .run();
 
   const created = await DB.prepare(
-    "SELECT id, name, category_slug, description, yaml, tags, sort_order, created_at, updated_at FROM components WHERE id = ?"
+    "SELECT id, name, category_slug, description, yaml, tags, sort_order, preview_url, created_at, updated_at FROM components WHERE id = ?"
   )
     .bind(id)
     .first();
