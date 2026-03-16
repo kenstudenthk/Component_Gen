@@ -1,159 +1,199 @@
-import { useState, useEffect } from "react";
-import { useNavigate, Link } from "react-router-dom";
-import { ChevronLeft } from "lucide-react";
-import Navbar from "../components/Navbar";
-import YamlViewer from "../components/YamlViewer";
-import { createComponent, getCategories } from "../lib/api";
+import React, { useState, useEffect } from 'react';
 
-const EMPTY_FORM = {
-  name: "",
-  category_slug: "buttons",
-  description: "",
-  yaml: "",
-  tags: "",
+// ============================================================================
+// NOTE: For your actual GitHub repository, UNCOMMENT the following 3 lines 
+// and DELETE the "CANVAS MOCKS" section below.
+// ============================================================================
+// import { useNavigate, Link } from 'react-router-dom';
+// import { createComponent, getCategories } from '../lib/api';
+// import Navbar from '../components/Navbar';
+
+// --- START CANVAS MOCKS (To allow this file to compile in the preview) ---
+const useNavigate = () => (path) => console.log("Navigating to:", path);
+const Link = ({ to, children, className }) => <a href={to} className={className}>{children}</a>;
+const getCategories = async () => [
+  { category: 'Navigation' }, 
+  { category: 'Forms' }, 
+  { category: 'Buttons' }
+];
+const createComponent = async (data) => { 
+  console.log("Mock saved component:", data); 
+  return { success: true }; 
 };
+const Navbar = () => (
+  <header className="px-6 py-4 bg-slate-900 border-b border-slate-800 text-white font-bold">
+    PowerHub Admin (Mock Navbar)
+  </header>
+);
+// --- END CANVAS MOCKS ---
 
 export default function AdminNew() {
   const navigate = useNavigate();
-  const [form, setForm] = useState(EMPTY_FORM);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [categories, setCategories] = useState([]);
-  const [saving, setSaving] = useState(false);
-  const [error, setError] = useState(null);
+  const [error, setError] = useState('');
+  
+  // Initialize form state
+  const [formData, setFormData] = useState({
+    name: '',
+    category: '',
+    description: '',
+    yaml: ''
+  });
 
+  // Fetch existing categories from your Cloudflare D1 backend
   useEffect(() => {
     getCategories()
-      .then(setCategories)
-      .catch((e) => console.error('Failed to load categories:', e));
+      .then(data => {
+        if (data && Array.isArray(data)) {
+          setCategories(data);
+        }
+      })
+      .catch(err => {
+        console.error("Failed to load categories:", err);
+      });
   }, []);
 
-  const set = (field) => (e) =>
-    setForm((f) => ({ ...f, [field]: e.target.value }));
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!form.name.trim() || !form.yaml.trim()) {
-      setError("Name and YAML are required.");
-      return;
-    }
-    setSaving(true);
-    setError(null);
+    setIsSubmitting(true);
+    setError('');
+    
     try {
-      await createComponent(form);
-      navigate("/admin");
+      // Create a slug for the category
+      const categorySlug = formData.category.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
+      
+      const newComponent = {
+        name: formData.name,
+        category: formData.category,
+        categorySlug: categorySlug,
+        description: formData.description,
+        yaml: formData.yaml,
+        isCustom: true // Mark as custom to differentiate from seed data
+      };
+      
+      const result = await createComponent(newComponent);
+      
+      if (result && result.success) {
+        navigate('/admin'); // Go back to admin list after saving
+      } else {
+        throw new Error(result?.error || 'Failed to save component');
+      }
     } catch (err) {
-      setError(err.message);
-      setSaving(false);
+      console.error("Failed to create component", err);
+      setError(err.message || "Failed to save component. Check console for details.");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen bg-slate-950 text-slate-200">
       <Navbar />
-      <main className="flex-1 mx-auto w-full max-w-3xl px-6 py-10">
-        <Link
-          to="/admin"
-          className="inline-flex items-center gap-1 text-sm text-slate-400 hover:text-white transition-colors mb-6"
-        >
-          <ChevronLeft size={14} />
-          Admin
-        </Link>
+      
+      <main className="max-w-4xl mx-auto px-6 py-12">
+        <div className="flex items-center justify-between mb-8">
+          <h1 className="text-3xl font-bold text-white">Add New Component</h1>
+          <Link to="/admin" className="text-slate-400 hover:text-white transition-colors">
+            Cancel & Back
+          </Link>
+        </div>
 
-        <h1 className="text-2xl font-bold text-white mb-8">New Component</h1>
+        {error && (
+          <div className="bg-red-900/50 border border-red-500/50 text-red-200 p-4 rounded-xl mb-6">
+            {error}
+          </div>
+        )}
 
-        <form onSubmit={handleSubmit} className="flex flex-col gap-5">
-          {/* Name */}
-          <label className="flex flex-col gap-1.5">
-            <span className="text-sm font-medium text-slate-300">
-              Name <span className="text-red-400">*</span>
-            </span>
+        <form onSubmit={handleSubmit} className="bg-slate-900 border border-slate-800 rounded-2xl p-8 shadow-xl space-y-6">
+          
+          {/* Name Field */}
+          <div>
+            <label className="block text-sm font-bold text-slate-400 uppercase tracking-widest mb-2">
+              Component Name
+            </label>
             <input
               type="text"
-              value={form.name}
-              onChange={set("name")}
-              placeholder="e.g. Primary Button"
-              className="rounded-lg border border-slate-700 bg-slate-900 px-3 py-2 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-blue-500 transition-colors"
+              name="name"
+              value={formData.name}
+              onChange={handleChange}
+              required
+              placeholder="e.g. Modern Primary Button"
+              className="w-full bg-slate-950 border border-slate-700 rounded-xl p-4 text-white focus:outline-none focus:ring-2 focus:ring-blue-600 transition-all"
             />
-          </label>
+          </div>
 
-          {/* Category */}
-          <label className="flex flex-col gap-1.5">
-            <span className="text-sm font-medium text-slate-300">Category</span>
-            <select
-              value={form.category_slug}
-              onChange={set("category_slug")}
-              className="rounded-lg border border-slate-700 bg-slate-900 px-3 py-2 text-sm text-white focus:outline-none focus:border-blue-500 transition-colors"
-            >
-              {categories.map((cat) => (
-                <option key={cat.slug} value={cat.slug}>
-                  {cat.name}
-                </option>
+          {/* Category Dropdown (Datalist) */}
+          <div>
+            <label className="block text-sm font-bold text-slate-400 uppercase tracking-widest mb-2">
+              Category
+            </label>
+            {/* The 'list' attribute connects this input to the datalist below */}
+            <input
+              type="text"
+              name="category"
+              list="existing-categories"
+              value={formData.category}
+              onChange={handleChange}
+              required
+              placeholder="Select existing or type a new one..."
+              className="w-full bg-slate-950 border border-slate-700 rounded-xl p-4 text-white focus:outline-none focus:ring-2 focus:ring-blue-600 transition-all"
+            />
+            {/* Datalist provides the dropdown options mapped from your API */}
+            <datalist id="existing-categories">
+              {categories.map((cat, index) => (
+                <option key={index} value={cat.category} />
               ))}
-            </select>
-          </label>
+            </datalist>
+          </div>
 
-          {/* Description */}
-          <label className="flex flex-col gap-1.5">
-            <span className="text-sm font-medium text-slate-300">Description</span>
+          {/* Description Field */}
+          <div>
+            <label className="block text-sm font-bold text-slate-400 uppercase tracking-widest mb-2">
+              Description (Optional)
+            </label>
             <input
               type="text"
-              value={form.description}
-              onChange={set("description")}
-              placeholder="Short description"
-              className="rounded-lg border border-slate-700 bg-slate-900 px-3 py-2 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-blue-500 transition-colors"
+              name="description"
+              value={formData.description}
+              onChange={handleChange}
+              placeholder="Brief description of this component..."
+              className="w-full bg-slate-950 border border-slate-700 rounded-xl p-4 text-white focus:outline-none focus:ring-2 focus:ring-blue-600 transition-all"
             />
-          </label>
+          </div>
 
-          {/* Tags */}
-          <label className="flex flex-col gap-1.5">
-            <span className="text-sm font-medium text-slate-300">Tags</span>
-            <input
-              type="text"
-              value={form.tags}
-              onChange={set("tags")}
-              placeholder="Comma-separated, e.g. primary, filled"
-              className="rounded-lg border border-slate-700 bg-slate-900 px-3 py-2 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-blue-500 transition-colors"
-            />
-          </label>
-
-          {/* YAML */}
-          <label className="flex flex-col gap-1.5">
-            <span className="text-sm font-medium text-slate-300">
-              YAML <span className="text-red-400">*</span>
-            </span>
+          {/* YAML Source Field */}
+          <div>
+            <label className="block text-sm font-bold text-slate-400 uppercase tracking-widest mb-2">
+              PowerApps YAML Code
+            </label>
             <textarea
-              value={form.yaml}
-              onChange={set("yaml")}
-              placeholder="Paste Power Apps Canvas YAML here…"
+              name="yaml"
+              value={formData.yaml}
+              onChange={handleChange}
+              required
               rows={12}
-              className="rounded-lg border border-slate-700 bg-slate-900 px-3 py-2 text-xs font-mono text-slate-200 placeholder-slate-500 focus:outline-none focus:border-blue-500 transition-colors resize-y"
-            />
-          </label>
+              placeholder={"- Control: Button\n  Properties:\n    Text: =\"Submit\""}
+              className="w-full bg-black border border-slate-700 rounded-xl p-4 text-emerald-400 font-mono text-sm focus:outline-none focus:ring-2 focus:ring-blue-600 transition-all leading-relaxed shadow-inner"
+            ></textarea>
+          </div>
 
-          {/* Preview */}
-          {form.yaml.trim() && (
-            <div className="flex flex-col gap-1.5">
-              <span className="text-sm font-medium text-slate-300">Preview</span>
-              <YamlViewer yaml={form.yaml} />
-            </div>
-          )}
-
-          {error && <p className="text-red-400 text-sm">{error}</p>}
-
-          <div className="flex gap-3 pt-2">
+          {/* Submit Button */}
+          <div className="pt-4 border-t border-slate-800 flex justify-end">
             <button
               type="submit"
-              disabled={saving}
-              className="rounded-xl bg-blue-600 hover:bg-blue-500 px-5 py-2 text-sm font-semibold text-white transition-colors disabled:opacity-50"
+              disabled={isSubmitting}
+              className="px-8 py-3 bg-blue-600 hover:bg-blue-500 disabled:bg-blue-600/50 text-white rounded-xl font-bold shadow-lg shadow-blue-600/20 transition-all flex items-center gap-2"
             >
-              {saving ? "Saving…" : "Save Component"}
+              {isSubmitting ? 'Saving...' : 'Save Component'}
             </button>
-            <Link
-              to="/admin"
-              className="rounded-xl border border-slate-700 px-5 py-2 text-sm font-semibold text-slate-300 hover:text-white hover:border-slate-600 transition-colors"
-            >
-              Cancel
-            </Link>
           </div>
+
         </form>
       </main>
     </div>
